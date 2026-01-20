@@ -10,7 +10,7 @@ const Login = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.post('http://localhost:5000/api/admin/login', { password });
+            const res = await axios.post('/api/admin/login', { password });
             if (res.data.success) {
                 localStorage.setItem('adminAuth', 'true');
                 navigate('/admin/dashboard');

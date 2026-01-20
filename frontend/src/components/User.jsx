@@ -13,7 +13,7 @@ const User = () => {
     const handleCheck = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.post('http://localhost:5000/api/user/check-mark', search);
+            const res = await axios.post('/api/user/check-mark', search);
             if (res.data.found) {
                 setResults(res.data.data);
             } else {

@@ -40,7 +40,7 @@ const Admin = () => {
     const handleSearch = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.post('http://localhost:5000/api/user/check-mark', search);
+            const res = await axios.post('/api/user/check-mark', search);
             if (res.data.found) {
                 setSearchResults(res.data.data);
             } else {
@@ -77,7 +77,7 @@ const Admin = () => {
         try {
             if (editingId) {
                 // Update
-                await axios.put(`http://localhost:5000/api/admin/update-mark/${editingId}`, formData);
+                await axios.put(`/api/admin/update-mark/${editingId}`, formData);
                 Swal.fire({
                     icon: 'success',
                     title: 'Updated',
@@ -87,7 +87,7 @@ const Admin = () => {
                 });
             } else {
                 // Add
-                await axios.post('http://localhost:5000/api/admin/add-mark', formData);
+                await axios.post('/api/admin/add-mark', formData);
                 Swal.fire({
                     icon: 'success',
                     title: 'Success',
