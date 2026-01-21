@@ -7,6 +7,7 @@ const Admin = () => {
     const [search, setSearch] = useState({ registerNumber: '', name: '' });
     const [searchResults, setSearchResults] = useState([]);
     const [editingId, setEditingId] = useState(null);
+    const [allRecords, setAllRecords] = useState([]);
 
     const [formData, setFormData] = useState({
         name: '',
@@ -35,6 +36,15 @@ const Admin = () => {
         const newSubjects = [...formData.subjects];
         newSubjects[index] = { ...newSubjects[index], [field]: value };
         setFormData({ ...formData, subjects: newSubjects });
+    };
+
+    const fetchAllRecords = async () => {
+        try {
+            const res = await axios.get('/api/admin/all-marks');
+            setAllRecords(res.data);
+        } catch (error) {
+            console.error(error);
+        }
     };
 
     const handleSearch = async (e) => {
@@ -125,6 +135,13 @@ const Admin = () => {
                 >
                     Update Existing
                 </button>
+                <button
+                    className="btn-primary"
+                    style={{ opacity: mode === 'list' ? 1 : 0.5 }}
+                    onClick={() => { setMode('list'); resetForm(); fetchAllRecords(); }}
+                >
+                    Existing Students
+                </button>
             </div>
 
             {mode === 'edit' && !editingId && (
@@ -163,6 +180,36 @@ const Admin = () => {
                             ))}
                         </div>
                     )}
+                </div>
+            )}
+
+            {mode === 'list' && (
+                <div>
+                    <h3>Existing Students List</h3>
+                    <div style={{ maxHeight: '500px', overflowY: 'auto', marginTop: '1rem' }}>
+                        {allRecords.length > 0 ? (
+                            allRecords.map(record => (
+                                <div key={record._id} className="glass-card" style={{ padding: '1rem', marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <div style={{ textAlign: 'left' }}>
+                                        <strong>{record.name}</strong> <br />
+                                        <small>Reg: {record.registerNumber}</small>
+                                    </div>
+                                    <div style={{ textAlign: 'right' }}>
+                                        <small>{record.examType}</small> <br />
+                                        <button
+                                            className="btn-primary"
+                                            style={{ padding: '0.2rem 0.5rem', fontSize: '0.8rem', marginTop: '0.3rem' }}
+                                            onClick={() => { setMode('edit'); handleEdit(record); }}
+                                        >
+                                            Edit
+                                        </button>
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            <p>No records found.</p>
+                        )}
+                    </div>
                 </div>
             )}
 

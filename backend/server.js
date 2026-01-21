@@ -93,6 +93,16 @@ app.put('/api/admin/update-mark/:id', async (req, res) => {
     }
 });
 
+// Admin: Get All Marks
+app.get('/api/admin/all-marks', async (req, res) => {
+    try {
+        const marks = await StudentMark.find({}).sort({ createdAt: -1 });
+        res.status(200).json(marks);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching marks', error: error.message });
+    }
+});
+
 // Admin: Login (Simple)
 app.post('/api/admin/login', (req, res) => {
     const { password } = req.body;
