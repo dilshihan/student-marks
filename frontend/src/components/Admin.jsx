@@ -65,8 +65,8 @@ const Admin = () => {
             registerNumber: record.registerNumber,
             className: record.className,
             examType: record.examType,
-            subjects: record.subjects.length === 6 ? record.subjects :
-                [...record.subjects, ...Array(6 - record.subjects.length).fill({ subjectName: '', mark: '' })]
+            subjects: record.subjects.length >= 7 ? record.subjects.slice(0, 7) :
+                [...record.subjects, ...Array(7 - record.subjects.length).fill({ subjectName: '', mark: '' })]
         });
         setSearchResults([]); // Clear search results to show form
     };
