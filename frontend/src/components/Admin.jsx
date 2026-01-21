@@ -8,6 +8,7 @@ const Admin = () => {
     const [searchResults, setSearchResults] = useState([]);
     const [editingId, setEditingId] = useState(null);
     const [allRecords, setAllRecords] = useState([]);
+    const [classFilter, setClassFilter] = useState('');
 
     const [formData, setFormData] = useState({
         name: '',
@@ -186,28 +187,35 @@ const Admin = () => {
             {mode === 'list' && (
                 <div>
                     <h3>Existing Students List</h3>
-                    <div style={{ maxHeight: '500px', overflowY: 'auto', marginTop: '1rem' }}>
-                        {allRecords.length > 0 ? (
-                            allRecords.map(record => (
-                                <div key={record._id} className="glass-card" style={{ padding: '1rem', marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <div style={{ textAlign: 'left' }}>
-                                        <strong>{record.name}</strong> <br />
-                                        <small>Reg: {record.registerNumber}</small>
+                    <div style={{ marginBottom: '1rem', marginTop: '1rem' }}>
+                        <input
+                            className="input-field"
+                            placeholder="Filter by Class (e.g. 10A)"
+                            value={classFilter}
+                            onChange={(e) => setClassFilter(e.target.value)}
+                            style={{ width: '100%' }}
+                        />
+                    </div>
+                    <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
+                        {allRecords.filter(r =>
+                            !classFilter || r.className?.toLowerCase().includes(classFilter.toLowerCase())
+                        ).length > 0 ? (
+                            allRecords
+                                .filter(r => !classFilter || r.className?.toLowerCase().includes(classFilter.toLowerCase()))
+                                .map(record => (
+                                    <div key={record._id} className="glass-card" style={{ padding: '1rem', marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <div style={{ textAlign: 'left' }}>
+                                            <strong>{record.name}</strong> <br />
+                                            <small>Reg: {record.registerNumber}</small>
+                                        </div>
+                                        <div style={{ textAlign: 'right' }}>
+                                            <small>{record.className}</small> <br />
+                                            <small>{record.examType}</small>
+                                        </div>
                                     </div>
-                                    <div style={{ textAlign: 'right' }}>
-                                        <small>{record.examType}</small> <br />
-                                        <button
-                                            className="btn-primary"
-                                            style={{ padding: '0.2rem 0.5rem', fontSize: '0.8rem', marginTop: '0.3rem' }}
-                                            onClick={() => { setMode('edit'); handleEdit(record); }}
-                                        >
-                                            Edit
-                                        </button>
-                                    </div>
-                                </div>
-                            ))
+                                ))
                         ) : (
-                            <p>No records found.</p>
+                            <p style={{ marginTop: '1rem' }}>No records found for this class.</p>
                         )}
                     </div>
                 </div>
