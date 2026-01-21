@@ -9,6 +9,8 @@ const Admin = () => {
     const [editingId, setEditingId] = useState(null);
     const [allRecords, setAllRecords] = useState([]);
     const [classFilter, setClassFilter] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
 
     const [formData, setFormData] = useState({
         name: '',
@@ -186,31 +188,63 @@ const Admin = () => {
                             className="input-field"
                             placeholder="Filter by Class (e.g. 10A)"
                             value={classFilter}
-                            onChange={(e) => setClassFilter(e.target.value)}
+                            onChange={(e) => { setClassFilter(e.target.value); setCurrentPage(1); }}
                             style={{ width: '100%' }}
                         />
                     </div>
-                    <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
-                        {allRecords.filter(r =>
-                            !classFilter || r.className?.toLowerCase().includes(classFilter.toLowerCase())
-                        ).length > 0 ? (
-                            allRecords
-                                .filter(r => !classFilter || r.className?.toLowerCase().includes(classFilter.toLowerCase()))
-                                .map(record => (
-                                    <div key={record._id} className="glass-card" style={{ padding: '1rem', marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <div style={{ textAlign: 'left' }}>
-                                            <strong>{record.name}</strong> <br />
-                                            <small>Reg: {record.registerNumber}</small>
-                                        </div>
-                                        <div style={{ textAlign: 'right' }}>
-                                            <small>{record.className}</small> <br />
-                                            <small>{record.examType}</small>
-                                        </div>
-                                    </div>
-                                ))
-                        ) : (
-                            <p style={{ marginTop: '1rem' }}>No records found for this class.</p>
-                        )}
+                    <div style={{ maxHeight: '700px', overflowY: 'auto' }}>
+                        {(() => {
+                            const filtered = allRecords.filter(r =>
+                                !classFilter || r.className?.toLowerCase().includes(classFilter.toLowerCase())
+                            );
+                            const totalPages = Math.ceil(filtered.length / itemsPerPage);
+                            const paginated = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+                            if (paginated.length > 0) {
+                                return (
+                                    <>
+                                        {paginated.map(record => (
+                                            <div key={record._id} className="glass-card" style={{ padding: '1rem', marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                <div style={{ textAlign: 'left' }}>
+                                                    <strong>{record.name}</strong> <br />
+                                                    <small>Reg: {record.registerNumber}</small>
+                                                </div>
+                                                <div style={{ textAlign: 'right' }}>
+                                                    <small>{record.className}</small> <br />
+                                                    <small>{record.examType}</small>
+                                                </div>
+                                            </div>
+                                        ))}
+
+                                        {totalPages > 1 && (
+                                            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', marginTop: '2rem', paddingBottom: '1rem' }}>
+                                                <button
+                                                    className="btn-primary"
+                                                    style={{ padding: '0.5rem 1rem', opacity: currentPage === 1 ? 0.5 : 1 }}
+                                                    disabled={currentPage === 1}
+                                                    onClick={() => setCurrentPage(prev => prev - 1)}
+                                                >
+                                                    Previous
+                                                </button>
+                                                <span style={{ fontWeight: 'bold', color: 'var(--primary)' }}>
+                                                    Page {currentPage} of {totalPages}
+                                                </span>
+                                                <button
+                                                    className="btn-primary"
+                                                    style={{ padding: '0.5rem 1rem', opacity: currentPage === totalPages ? 0.5 : 1 }}
+                                                    disabled={currentPage === totalPages}
+                                                    onClick={() => setCurrentPage(prev => prev + 1)}
+                                                >
+                                                    Next
+                                                </button>
+                                            </div>
+                                        )}
+                                    </>
+                                );
+                            } else {
+                                return <p style={{ marginTop: '1rem' }}>No records found for this class.</p>;
+                            }
+                        })()}
                     </div>
                 </div>
             )}
