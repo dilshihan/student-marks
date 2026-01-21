@@ -13,7 +13,7 @@ const Admin = () => {
         registerNumber: '',
         className: '',
         examType: 'Internal / Series Exam',
-        subjects: Array(10).fill(null).map(() => ({ subjectName: '', mark: '' }))
+        subjects: Array(7).fill({ subjectName: '', mark: '' })
     });
 
     const resetForm = () => {
@@ -22,7 +22,7 @@ const Admin = () => {
             registerNumber: '',
             className: '',
             examType: 'Internal / Series Exam',
-            subjects: Array(10).fill(null).map(() => ({ subjectName: '', mark: '' }))
+            subjects: Array(7).fill({ subjectName: '', mark: '' })
         });
         setEditingId(null);
     };
@@ -65,8 +65,8 @@ const Admin = () => {
             registerNumber: record.registerNumber,
             className: record.className,
             examType: record.examType,
-            subjects: record.subjects.length >= 10 ? record.subjects :
-                [...record.subjects, ...Array(10 - record.subjects.length).fill(null).map(() => ({ subjectName: '', mark: '' }))]
+            subjects: record.subjects.length === 6 ? record.subjects :
+                [...record.subjects, ...Array(6 - record.subjects.length).fill({ subjectName: '', mark: '' })]
         });
         setSearchResults([]); // Clear search results to show form
     };
@@ -186,27 +186,25 @@ const Admin = () => {
 
                         <div style={{ marginTop: '2rem' }}>
                             <h3 style={{ marginBottom: '1rem', textAlign: 'left' }}>Subjects & Marks</h3>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '1rem' }}>
-                                {formData.subjects.map((subject, index) => (
-                                    <React.Fragment key={index}>
-                                        <input
-                                            className="input-field"
-                                            placeholder={`Subject ${index + 1} Name`}
-                                            value={subject.subjectName}
-                                            onChange={(e) => handleSubjectChange(index, 'subjectName', e.target.value)}
-                                            style={{ marginBottom: '0.5rem' }}
-                                        />
-                                        <input
-                                            type="number"
-                                            className="input-field"
-                                            placeholder={`Mark`}
-                                            value={subject.mark}
-                                            onChange={(e) => handleSubjectChange(index, 'mark', e.target.value)}
-                                            style={{ marginBottom: '0.5rem' }}
-                                        />
-                                    </React.Fragment>
-                                ))}
-                            </div>
+                            {formData.subjects.map((subject, index) => (
+                                <div key={index} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '0.5rem' }}>
+                                    <input
+                                        className="input-field"
+                                        placeholder={`Subject ${index + 1} Name`}
+                                        value={subject.subjectName}
+                                        onChange={(e) => handleSubjectChange(index, 'subjectName', e.target.value)}
+                                    // Not required
+                                    />
+                                    <input
+                                        type="number"
+                                        className="input-field"
+                                        placeholder={`Mark`}
+                                        value={subject.mark}
+                                        onChange={(e) => handleSubjectChange(index, 'mark', e.target.value)}
+                                    // Not required
+                                    />
+                                </div>
+                            ))}
                         </div>
 
                         <button type="submit" className="btn-primary" style={{ marginTop: '1rem', width: '100%' }}>
