@@ -26,7 +26,8 @@ const User = () => {
             }
         } catch (err) {
             console.error(err);
-            Swal.fire({ icon: 'error', title: 'Error', text: 'Something went wrong' });
+            const errorMsg = err.response?.data?.message || 'Something went wrong';
+            Swal.fire({ icon: 'error', title: 'Error', text: errorMsg });
         }
     };
 

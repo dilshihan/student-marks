@@ -11,12 +11,18 @@ app.use(cors());
 app.use(express.json());
 
 // MongoDB Connection
-// Replace with your MongoDB URI
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/student-marks';
+const MONGO_URI = process.env.MONGO_URI;
 
+if (!MONGO_URI) {
+    console.error('CRITICAL: MONGO_URI is not defined in environment variables');
+}
+
+// Connect with options to handle serverless better
 mongoose.connect(MONGO_URI)
-    .then(() => console.log('MongoDB Connected'))
-    .catch(err => console.log(err));
+    .then(() => console.log('MongoDB Connected Successfully'))
+    .catch(err => {
+        console.error('MongoDB Connection Error:', err.message);
+    });
 
 // Schema
 const StudentMarkSchema = new mongoose.Schema({
@@ -28,9 +34,10 @@ const StudentMarkSchema = new mongoose.Schema({
         subjectName: { type: String, required: true },
         mark: { type: Number, required: true }
     }]
-});
+}, { timestamps: true });
 
-const StudentMark = mongoose.model('StudentMark', StudentMarkSchema);
+// Prevent model re-definition error in HMR/Serverless
+const StudentMark = mongoose.models.StudentMark || mongoose.model('StudentMark', StudentMarkSchema);
 
 // Routes
 
@@ -38,6 +45,10 @@ const StudentMark = mongoose.model('StudentMark', StudentMarkSchema);
 app.post('/api/admin/add-mark', async (req, res) => {
     try {
         const { name, registerNumber, className, examType, subjects } = req.body;
+
+        if (!name || !registerNumber || !className || !examType) {
+            return res.status(400).json({ message: 'All required fields must be provided' });
+        }
 
         const regNo = registerNumber.trim();
         const exam = examType.trim();
@@ -49,12 +60,12 @@ app.post('/api/admin/add-mark', async (req, res) => {
         }
 
         // Filter out empty subjects
-        const validSubjects = subjects.filter(sub => sub.subjectName && sub.mark !== '' && sub.mark !== null);
+        const validSubjects = subjects ? subjects.filter(sub => sub.subjectName && sub.mark !== '' && sub.mark !== null) : [];
 
         const newMark = new StudentMark({
-            name,
+            name: name.trim(),
             registerNumber: regNo,
-            className,
+            className: className.trim(),
             examType: exam,
             subjects: validSubjects
         });
@@ -62,6 +73,7 @@ app.post('/api/admin/add-mark', async (req, res) => {
         await newMark.save();
         res.status(201).json({ message: 'Mark added successfully', data: newMark });
     } catch (error) {
+        console.error('Add mark error:', error);
         res.status(500).json({ message: 'Error adding mark', error: error.message });
     }
 });
@@ -96,11 +108,22 @@ app.put('/api/admin/update-mark/:id', async (req, res) => {
 // Admin: Get All Marks
 app.get('/api/admin/all-marks', async (req, res) => {
     try {
-        const marks = await StudentMark.find({}).sort({ createdAt: -1 });
+        // Since we added timestamps, we can sort by createdAt
+        const marks = await StudentMark.find({}).sort({ updatedAt: -1 });
         res.status(200).json(marks);
     } catch (error) {
+        console.error('Fetch all marks error:', error);
         res.status(500).json({ message: 'Error fetching marks', error: error.message });
     }
+});
+
+// Health check route
+app.get('/api/health', (req, res) => {
+    res.json({
+        status: 'ok',
+        database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+        timestamp: new Date()
+    });
 });
 
 // Admin: Login (Simple)
@@ -119,19 +142,29 @@ app.post('/api/user/check-mark', async (req, res) => {
     try {
         const { registerNumber, name } = req.body;
 
-        // Case insensitive search might be better, but exact match for now as per "user found show the marks"
-        // matching both reg number and name
+        if (!registerNumber || !name) {
+            return res.status(400).json({ message: 'Register number and name are required' });
+        }
+
+        const regNo = registerNumber.trim();
+        const studentName = name.trim();
+
+        // Escape regex special characters to prevent errors
+        const escapedName = studentName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+        // Case insensitive search
         const students = await StudentMark.find({
-            registerNumber: registerNumber,
-            name: { $regex: new RegExp(`^${name}$`, 'i') } // Case insensitive name match
+            registerNumber: regNo,
+            name: { $regex: new RegExp(`^${escapedName}$`, 'i') }
         });
 
-        if (students.length > 0) {
+        if (students && students.length > 0) {
             res.status(200).json({ found: true, data: students });
         } else {
             res.status(200).json({ found: false, message: 'Student not found' });
         }
     } catch (error) {
+        console.error('Check mark error:', error);
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 });
