@@ -59,9 +59,7 @@ const Admin = () => {
                 Swal.fire({
                     icon: 'info',
                     title: 'Not Found',
-                    text: 'No matching records found',
-                    background: '#1e293b',
-                    color: '#fff'
+                    text: 'No matching records found'
                 });
             }
         } catch (error) {
@@ -92,9 +90,7 @@ const Admin = () => {
                 Swal.fire({
                     icon: 'success',
                     title: 'Updated',
-                    text: 'Marks updated successfully',
-                    background: '#1e293b',
-                    color: '#fff'
+                    text: 'Marks updated successfully'
                 });
             } else {
                 // Add
@@ -102,9 +98,7 @@ const Admin = () => {
                 Swal.fire({
                     icon: 'success',
                     title: 'Success',
-                    text: 'Marks added successfully',
-                    background: '#1e293b',
-                    color: '#fff'
+                    text: 'Marks added successfully'
                 });
             }
             resetForm();
@@ -112,9 +106,7 @@ const Admin = () => {
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
-                text: error.response?.data?.message || 'Operation failed',
-                background: '#1e293b',
-                color: '#fff'
+                text: error.response?.data?.message || 'Operation failed'
             });
         }
     };
@@ -146,7 +138,7 @@ const Admin = () => {
             </div>
 
             {mode === 'edit' && !editingId && (
-                <div style={{ marginBottom: '2rem', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '2rem' }}>
+                <div style={{ marginBottom: '2rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '2rem' }}>
                     <h3>Find Student to Edit</h3>
                     <form onSubmit={handleSearch} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '1rem' }}>
                         <input
@@ -266,7 +258,7 @@ const Admin = () => {
                             {editingId ? 'Update Record' : 'Add Record'}
                         </button>
                         {editingId && (
-                            <button type="button" onClick={() => { setMode('edit'); setEditingId(null); }} style={{ background: 'transparent', border: '1px solid white', color: 'white', padding: '0.5rem', borderRadius: '0.5rem', marginTop: '1rem', width: '100%', cursor: 'pointer' }}>
+                            <button type="button" onClick={() => { setMode('edit'); setEditingId(null); }} style={{ background: 'transparent', border: '1px solid var(--primary)', color: 'var(--primary)', padding: '0.5rem', borderRadius: '0.5rem', marginTop: '1rem', width: '100%', cursor: 'pointer', fontWeight: '600' }}>
                                 Cancel Edit
                             </button>
                         )}

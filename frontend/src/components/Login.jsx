@@ -20,17 +20,13 @@ const Login = () => {
                 Swal.fire({
                     icon: 'error',
                     title: 'Access Denied',
-                    text: 'Invalid Password',
-                    background: '#1e293b',
-                    color: '#fff'
+                    text: 'Invalid Password'
                 });
             } else {
                 Swal.fire({
                     icon: 'error',
                     title: 'Login Error',
-                    text: error.message === 'Network Error' ? 'Cannot connect to server. Is the backend running?' : (error.response?.data?.message || 'Something went wrong'),
-                    background: '#1e293b',
-                    color: '#fff'
+                    text: error.message === 'Network Error' ? 'Cannot connect to server. Is the backend running?' : (error.response?.data?.message || 'Something went wrong')
                 });
             }
         }
