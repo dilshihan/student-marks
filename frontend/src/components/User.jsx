@@ -57,35 +57,37 @@ const User = () => {
 
             {results && results.map((record, idx) => (
                 <div key={idx} className="glass-card" style={{ marginTop: '2rem', textAlign: 'left', borderTop: '4px solid var(--primary)' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #f1f5f9', paddingBottom: '1rem', marginBottom: '1rem' }}>
-                        <div>
+                    <div className="result-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid #f1f5f9', paddingBottom: '1rem', marginBottom: '1rem', flexWrap: 'wrap', gap: '1rem' }}>
+                        <div style={{ flex: '1 1 auto' }}>
                             <h3 style={{ margin: 0, color: 'var(--primary)', fontSize: '1.75rem' }}>{record.name}</h3>
                             <p style={{ margin: '0.5rem 0 0', color: 'var(--text-muted)' }}>Reg: {record.registerNumber}</p>
                         </div>
-                        <div style={{ textAlign: 'right' }}>
-                            <span style={{ background: 'rgba(6, 78, 59, 0.1)', color: 'var(--primary)', padding: '0.5rem 1rem', borderRadius: '2rem', fontWeight: 'bold' }}>
+                        <div style={{ textAlign: 'right', flex: '0 0 auto' }}>
+                            <span style={{ background: 'rgba(6, 78, 59, 0.1)', color: 'var(--primary)', padding: '0.5rem 1rem', borderRadius: '2rem', fontWeight: 'bold', display: 'inline-block' }}>
                                 {record.examType}
                             </span>
                             <p style={{ margin: '0.5rem 0 0', color: 'var(--text-muted)' }}>Class: {record.className}</p>
                         </div>
                     </div>
 
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Subject</th>
-                                <th style={{ textAlign: 'right' }}>Mark</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {record.subjects.map((sub, sIdx) => (
-                                <tr key={sIdx}>
-                                    <td>{sub.subjectName}</td>
-                                    <td style={{ textAlign: 'right', fontWeight: 'bold', color: 'var(--primary)' }}>{sub.mark}</td>
+                    <div className="table-responsive">
+                        <table className="results-table">
+                            <thead>
+                                <tr>
+                                    <th style={{ width: '70%' }}>Subject</th>
+                                    <th style={{ textAlign: 'right', width: '30%' }}>Mark</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {record.subjects.map((sub, sIdx) => (
+                                    <tr key={sIdx}>
+                                        <td>{sub.subjectName}</td>
+                                        <td style={{ textAlign: 'right', fontWeight: 'bold', color: 'var(--primary)' }}>{sub.mark}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             ))}
         </div>
