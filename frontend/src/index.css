@@ -1,9 +1,13 @@
 :root {
-  --primary: #064e3b; /* Deep Emerald Green */
+  --primary: #064e3b;
+  /* Deep Emerald Green */
   --primary-light: #065f46;
-  --secondary: #d4af37; /* Gold */
-  --accent: #b45309; /* Warm Amber */
-  --bg-warm: #fdfbf7; /* Ivory/Cream */
+  --secondary: #d4af37;
+  /* Gold */
+  --accent: #b45309;
+  /* Warm Amber */
+  --bg-warm: #fdfbf7;
+  /* Ivory/Cream */
   --text-main: #1f2937;
   --text-muted: #4b5563;
   --glass-bg: rgba(255, 255, 255, 0.9);
@@ -17,7 +21,7 @@ body {
   min-height: 100vh;
   font-family: var(--body-font);
   background-color: var(--bg-warm);
-  background-image: 
+  background-image:
     radial-gradient(circle at 2px 2px, rgba(212, 175, 55, 0.05) 1px, transparent 0);
   background-size: 40px 40px;
   color: var(--text-main);
@@ -32,7 +36,10 @@ body {
   text-align: center;
 }
 
-h1, h2, h3, .title {
+h1,
+h2,
+h3,
+.title {
   font-family: var(--header-font);
   color: var(--primary);
   letter-spacing: 0.02em;
@@ -127,8 +134,57 @@ h1, h2, h3, .title {
   border-radius: 2rem;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
   display: inline-flex;
-  gap: 2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
   border: 1px solid var(--glass-border);
+}
+
+.responsive-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .responsive-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .title {
+    font-size: 2.25rem;
+  }
+
+  .glass-card {
+    padding: 1.5rem;
+  }
+
+  .nav-container {
+    display: flex;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: 1.75rem;
+  }
+
+  .nav-container {
+    gap: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  #root {
+    padding: 1rem 0.5rem;
+  }
+
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
 }
 
 .nav-link {

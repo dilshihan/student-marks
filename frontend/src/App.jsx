@@ -14,7 +14,7 @@ const Navigation = () => {
       <Link to="/" className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}>Student Check</Link>
       {isAdmin && <Link to="/admin/dashboard" className={`nav-link ${location.pathname.includes('/admin') ? 'active' : ''}`}>Admin Dashboard</Link>}
       {!isAdmin && <Link to="/login" className={`nav-link ${location.pathname === '/login' ? 'active' : ''}`}>Admin Login</Link>}
-      {isAdmin && <button onClick={() => { localStorage.removeItem('adminAuth'); window.location.href = '/'; }} style={{ background: 'none', border: 'none', color: '#ef4444', marginLeft: '1rem', cursor: 'pointer' }}>Logout</button>}
+      {isAdmin && <button onClick={() => { localStorage.removeItem('adminAuth'); window.location.href = '/'; }} className="nav-link" style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontWeight: 'bold' }}>Logout</button>}
     </nav>
   );
 };

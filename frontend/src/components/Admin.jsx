@@ -113,24 +113,24 @@ const Admin = () => {
 
     return (
         <div className="glass-card" style={{ maxWidth: '800px', margin: '0 auto' }}>
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '2rem', gap: '1rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '2rem', gap: '1rem', flexWrap: 'wrap' }}>
                 <button
                     className="btn-primary"
-                    style={{ opacity: mode === 'add' ? 1 : 0.5 }}
+                    style={{ opacity: mode === 'add' ? 1 : 0.5, flex: '1 1 auto' }}
                     onClick={() => { setMode('add'); resetForm(); }}
                 >
                     Add New
                 </button>
                 <button
                     className="btn-primary"
-                    style={{ opacity: mode === 'edit' ? 1 : 0.5 }}
+                    style={{ opacity: mode === 'edit' ? 1 : 0.5, flex: '1 1 auto' }}
                     onClick={() => { setMode('edit'); resetForm(); }}
                 >
                     Update Existing
                 </button>
                 <button
                     className="btn-primary"
-                    style={{ opacity: mode === 'list' ? 1 : 0.5 }}
+                    style={{ opacity: mode === 'list' ? 1 : 0.5, flex: '1 1 auto' }}
                     onClick={() => { setMode('list'); resetForm(); fetchAllRecords(); }}
                 >
                     Existing Students
@@ -140,13 +140,14 @@ const Admin = () => {
             {mode === 'edit' && !editingId && (
                 <div style={{ marginBottom: '2rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '2rem' }}>
                     <h3>Find Student to Edit</h3>
-                    <form onSubmit={handleSearch} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '1rem' }}>
+                    <form onSubmit={handleSearch} className="responsive-grid" style={{ gap: '1rem' }}>
                         <input
                             className="input-field"
                             name="registerNumber"
                             placeholder="Register Number"
                             value={search.registerNumber}
                             onChange={(e) => setSearch({ ...search, registerNumber: e.target.value })}
+                            style={{ marginBottom: 0 }}
                             required
                         />
                         <input
@@ -155,9 +156,10 @@ const Admin = () => {
                             placeholder="Student Name"
                             value={search.name}
                             onChange={(e) => setSearch({ ...search, name: e.target.value })}
+                            style={{ marginBottom: 0 }}
                             required
                         />
-                        <button type="submit" className="btn-primary">Search</button>
+                        <button type="submit" className="btn-primary" style={{ gridColumn: 'span 1' }}>Search</button>
                     </form>
 
                     {searchResults.length > 0 && (
@@ -217,14 +219,14 @@ const Admin = () => {
                 <div>
                     <h2>{editingId ? 'Update Marks' : 'Add Student Marks'}</h2>
                     <form onSubmit={handleSubmit}>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                            <input className="input-field" name="name" placeholder="Student Name" value={formData.name} onChange={handleChange} required />
-                            <input className="input-field" name="registerNumber" placeholder="Register Number" value={formData.registerNumber} onChange={handleChange} required />
+                        <div className="responsive-grid" style={{ marginBottom: '1rem' }}>
+                            <input className="input-field" name="name" placeholder="Student Name" value={formData.name} onChange={handleChange} style={{ marginBottom: 0 }} required />
+                            <input className="input-field" name="registerNumber" placeholder="Register Number" value={formData.registerNumber} onChange={handleChange} style={{ marginBottom: 0 }} required />
                         </div>
 
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                            <input className="input-field" name="className" placeholder="Class" value={formData.className} onChange={handleChange} required />
-                            <select className="input-field" name="examType" value={formData.examType} onChange={handleChange} style={{ appearance: 'none' }}>
+                        <div className="responsive-grid" style={{ marginBottom: '1rem' }}>
+                            <input className="input-field" name="className" placeholder="Class" value={formData.className} onChange={handleChange} style={{ marginBottom: 0 }} required />
+                            <select className="input-field" name="examType" value={formData.examType} onChange={handleChange} style={{ appearance: 'none', marginBottom: 0 }}>
                                 <option value="Internal / Series Exam" style={{ color: 'black' }}>Internal / Series Exam</option>
                                 <option value="Model Exam" style={{ color: 'black' }}>Model Exam</option>
                                 <option value="Semester / Final Exam" style={{ color: 'black' }}>Semester / Final Exam</option>
@@ -234,12 +236,13 @@ const Admin = () => {
                         <div style={{ marginTop: '2rem' }}>
                             <h3 style={{ marginBottom: '1rem', textAlign: 'left' }}>Subjects & Marks</h3>
                             {formData.subjects.map((subject, index) => (
-                                <div key={index} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '0.5rem' }}>
+                                <div key={index} className="responsive-grid" style={{ gap: '0.5rem', marginBottom: '0.5rem' }}>
                                     <input
                                         className="input-field"
                                         placeholder={`Subject ${index + 1} Name`}
                                         value={subject.subjectName}
                                         onChange={(e) => handleSubjectChange(index, 'subjectName', e.target.value)}
+                                        style={{ marginBottom: 0 }}
                                     // Not required
                                     />
                                     <input
@@ -248,6 +251,7 @@ const Admin = () => {
                                         placeholder={`Mark`}
                                         value={subject.mark}
                                         onChange={(e) => handleSubjectChange(index, 'mark', e.target.value)}
+                                        style={{ marginBottom: 0 }}
                                     // Not required
                                     />
                                 </div>
