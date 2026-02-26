@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
+// Load .env for local dev; silently skip if not found (Vercel injects env vars automatically)
 require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 const app = express();
