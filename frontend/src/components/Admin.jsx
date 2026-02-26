@@ -207,7 +207,20 @@ const Admin = () => {
                                                 </div>
                                                 <div style={{ textAlign: 'right' }}>
                                                     <small>{record.className}</small> <br />
-                                                    <small>{record.examType}</small>
+                                                    <small>{record.examType}</small> <br />
+                                                    {(() => {
+                                                        const isPassed = record.subjects.length > 0 && record.subjects.every(sub => Number(sub.mark) >= 18);
+                                                        return (
+                                                            <span style={{
+                                                                color: isPassed ? '#059669' : '#dc2626',
+                                                                fontWeight: 'bold',
+                                                                fontSize: '0.8rem',
+                                                                textTransform: 'uppercase'
+                                                            }}>
+                                                                {isPassed ? 'Passed' : 'Failed'}
+                                                            </span>
+                                                        );
+                                                    })()}
                                                 </div>
                                             </div>
                                         ))}

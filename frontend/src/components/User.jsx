@@ -152,14 +152,27 @@ const User = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {record.subjects.map((sub, sIdx) => (
-                                        <tr key={sIdx}>
-                                            <td style={{ border: '1px solid #eee' }}>{sub.subjectName}</td>
-                                            <td style={{ textAlign: 'center', border: '1px solid #eee' }}>50</td>
-                                            <td style={{ textAlign: 'center', fontWeight: 'bold', color: 'var(--primary)', border: '1px solid #eee' }}>{sub.mark}</td>
-                                            <td style={{ textAlign: 'right', fontWeight: 'bold', border: '1px solid #eee' }}>{getGrade(sub.mark)}</td>
-                                        </tr>
-                                    ))}
+                                    {record.subjects.map((sub, sIdx) => {
+                                        const isSubjectFailed = Number(sub.mark) < 18;
+                                        return (
+                                            <tr key={sIdx}>
+                                                <td style={{ border: '1px solid #eee' }}>{sub.subjectName}</td>
+                                                <td style={{ textAlign: 'center', border: '1px solid #eee' }}>50</td>
+                                                <td style={{
+                                                    textAlign: 'center',
+                                                    fontWeight: 'bold',
+                                                    color: isSubjectFailed ? '#dc2626' : 'var(--primary)',
+                                                    border: '1px solid #eee'
+                                                }}>{sub.mark}</td>
+                                                <td style={{
+                                                    textAlign: 'right',
+                                                    fontWeight: 'bold',
+                                                    color: isSubjectFailed ? '#dc2626' : 'inherit',
+                                                    border: '1px solid #eee'
+                                                }}>{getGrade(sub.mark)}</td>
+                                            </tr>
+                                        );
+                                    })}
                                     <tr style={{ borderTop: '2px solid var(--primary)', background: 'rgba(6, 78, 59, 0.05)' }}>
                                         <td style={{ fontWeight: 'bold', fontSize: '1.1rem', border: '1px solid #eee' }}>Total</td>
                                         <td style={{ textAlign: 'center', fontWeight: 'bold', border: '1px solid #eee' }}>{totalMax}</td>
@@ -170,6 +183,29 @@ const User = () => {
                                     </tr>
                                 </tbody>
                             </table>
+                        </div>
+
+                        {/* Pass/Fail Status Badge */}
+                        <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
+                            {(() => {
+                                const isPassed = record.subjects.every(sub => Number(sub.mark) >= 18);
+                                return (
+                                    <div style={{
+                                        display: 'inline-block',
+                                        padding: '0.75rem 2.5rem',
+                                        borderRadius: '0.5rem',
+                                        fontSize: '1.5rem',
+                                        fontWeight: '800',
+                                        letterSpacing: '2px',
+                                        textTransform: 'uppercase',
+                                        backgroundColor: isPassed ? 'rgba(6, 78, 59, 0.1)' : 'rgba(220, 38, 38, 0.1)',
+                                        color: isPassed ? '#064e3b' : '#dc2626',
+                                        border: `2px solid ${isPassed ? '#064e3b' : '#dc2626'}`,
+                                    }}>
+                                        {isPassed ? 'PASSED' : 'FAILED'}
+                                    </div>
+                                );
+                            })()}
                         </div>
 
                         <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'center' }} className="no-export">
