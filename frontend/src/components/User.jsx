@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 const User = () => {
     const [search, setSearch] = useState({ registerNumber: '' });
     const [results, setResults] = useState(null);
+    const resultRef = useRef(null);
 
     const getGrade = (mark) => {
         const m = Number(mark);
@@ -43,37 +46,61 @@ const User = () => {
         }
     };
 
-    const handleDownload = () => {
-        window.print();
+    const handleDownload = async (record) => {
+        const element = document.getElementById(`report-${record.registerNumber}`);
+        if (!element) return;
+
+        // Visual feedback
+        Swal.fire({
+            title: 'Generating PDF...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        try {
+            // Temporarily hide the download button from the capture
+            const downloadBtn = element.querySelector('.no-export');
+            if (downloadBtn) downloadBtn.style.display = 'none';
+
+            const canvas = await html2canvas(element, {
+                scale: 2, // Higher scale for better quality
+                useCORS: true,
+                backgroundColor: '#ffffff'
+            });
+
+            if (downloadBtn) downloadBtn.style.display = 'flex';
+
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const imgProps = pdf.getImageProperties(imgData);
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+            pdf.save(`${record.name}_${record.registerNumber}_Marks.pdf`);
+
+            Swal.close();
+            Swal.fire({
+                icon: 'success',
+                title: 'Downloaded!',
+                text: 'Your mark sheet has been saved as a PDF.',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        } catch (error) {
+            console.error('PDF generation error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Download Failed',
+                text: 'Could not generate PDF. Please try again or use the print option.'
+            });
+        }
     };
 
     return (
         <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-            <style>
-                {`
-                    @media print {
-                        body * { visibility: hidden; }
-                        #print-section, #print-section * { visibility: visible; }
-                        #print-section { 
-                            position: absolute; 
-                            left: 0; 
-                            top: 0; 
-                            width: 100%;
-                            padding: 20px;
-                        }
-                        .no-print { display: none !important; }
-                        .glass-card { 
-                            border: 1px solid #ddd !important; 
-                            box-shadow: none !important; 
-                            background: white !important;
-                            color: black !important;
-                        }
-                        .results-table th, .results-table td {
-                            border: 1px solid #eee !important;
-                        }
-                    }
-                `}
-            </style>
             <div className="glass-card no-print">
                 <h2>Check Result</h2>
                 <form onSubmit={handleCheck}>
@@ -94,7 +121,7 @@ const User = () => {
                 const totalMax = record.subjects.length * 50;
 
                 return (
-                    <div key={idx} id="print-section" className="glass-card" style={{ marginTop: '2rem', textAlign: 'left', borderTop: '4px solid var(--primary)' }}>
+                    <div key={idx} id={`report-${record.registerNumber}`} className="glass-card" style={{ marginTop: '2rem', textAlign: 'left', borderTop: '4px solid var(--primary)', background: 'white' }}>
                         <div style={{ textAlign: 'center', marginBottom: '1.5rem', borderBottom: '2px solid var(--primary)', paddingBottom: '1rem' }}>
                             <h1 style={{ margin: 0, color: 'var(--primary)', fontSize: '1.8rem', textTransform: 'uppercase' }}>Hidayathul Anam Madrasa Kodakkad</h1>
                             <p style={{ margin: '5px 0', fontSize: '1.1rem', fontWeight: '500' }}>Student Progress Report</p>
@@ -118,26 +145,26 @@ const User = () => {
                             <table className="results-table">
                                 <thead>
                                     <tr>
-                                        <th style={{ width: '40%' }}>Subject</th>
-                                        <th style={{ textAlign: 'center', width: '20%' }}>Max Mark</th>
-                                        <th style={{ textAlign: 'center', width: '20%' }}>Earned Mark</th>
-                                        <th style={{ textAlign: 'right', width: '20%' }}>Grade</th>
+                                        <th style={{ width: '40%', border: '1px solid #eee' }}>Subject</th>
+                                        <th style={{ textAlign: 'center', width: '20%', border: '1px solid #eee' }}>Max Mark</th>
+                                        <th style={{ textAlign: 'center', width: '20%', border: '1px solid #eee' }}>Earned Mark</th>
+                                        <th style={{ textAlign: 'right', width: '20%', border: '1px solid #eee' }}>Grade</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {record.subjects.map((sub, sIdx) => (
                                         <tr key={sIdx}>
-                                            <td>{sub.subjectName}</td>
-                                            <td style={{ textAlign: 'center' }}>50</td>
-                                            <td style={{ textAlign: 'center', fontWeight: 'bold', color: 'var(--primary)' }}>{sub.mark}</td>
-                                            <td style={{ textAlign: 'right', fontWeight: 'bold' }}>{getGrade(sub.mark)}</td>
+                                            <td style={{ border: '1px solid #eee' }}>{sub.subjectName}</td>
+                                            <td style={{ textAlign: 'center', border: '1px solid #eee' }}>50</td>
+                                            <td style={{ textAlign: 'center', fontWeight: 'bold', color: 'var(--primary)', border: '1px solid #eee' }}>{sub.mark}</td>
+                                            <td style={{ textAlign: 'right', fontWeight: 'bold', border: '1px solid #eee' }}>{getGrade(sub.mark)}</td>
                                         </tr>
                                     ))}
                                     <tr style={{ borderTop: '2px solid var(--primary)', background: 'rgba(6, 78, 59, 0.05)' }}>
-                                        <td style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Total</td>
-                                        <td style={{ textAlign: 'center', fontWeight: 'bold' }}>{totalMax}</td>
-                                        <td style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '1.2rem', color: 'var(--primary)' }}>{totalEarned}</td>
-                                        <td style={{ textAlign: 'right', fontWeight: 'bold', color: 'var(--primary)' }}>
+                                        <td style={{ fontWeight: 'bold', fontSize: '1.1rem', border: '1px solid #eee' }}>Total</td>
+                                        <td style={{ textAlign: 'center', fontWeight: 'bold', border: '1px solid #eee' }}>{totalMax}</td>
+                                        <td style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '1.2rem', color: 'var(--primary)', border: '1px solid #eee' }}>{totalEarned}</td>
+                                        <td style={{ textAlign: 'right', fontWeight: 'bold', color: 'var(--primary)', border: '1px solid #eee' }}>
                                             {((totalEarned / totalMax) * 100).toFixed(1)}%
                                         </td>
                                     </tr>
@@ -145,10 +172,10 @@ const User = () => {
                             </table>
                         </div>
 
-                        <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'center' }} className="no-print">
-                            <button onClick={handleDownload} className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'center' }} className="no-export">
+                            <button onClick={() => handleDownload(record)} className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
-                                Download Result
+                                Download PDF
                             </button>
                         </div>
                     </div>
