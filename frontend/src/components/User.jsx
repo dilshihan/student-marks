@@ -64,21 +64,61 @@ const User = () => {
             const downloadBtn = element.querySelector('.no-export');
             if (downloadBtn) downloadBtn.style.display = 'none';
 
+            // Scroll to top so html2canvas can capture the full element on mobile
+            window.scrollTo(0, 0);
+            element.scrollIntoView({ behavior: 'instant', block: 'start' });
+
+            // Get the full dimensions of the element (not viewport-limited)
+            const fullWidth = element.scrollWidth;
+            const fullHeight = element.scrollHeight;
+
             const canvas = await html2canvas(element, {
-                scale: 2, // Higher scale for better quality
+                scale: 2,                    // Higher scale for better quality
                 useCORS: true,
-                backgroundColor: '#ffffff'
+                backgroundColor: '#ffffff',
+                // Tell html2canvas the full element size, not the viewport size.
+                // This is the key fix for mobile where the viewport is smaller
+                // than the element and causes partial captures.
+                windowWidth: fullWidth,
+                windowHeight: fullHeight,
+                width: fullWidth,
+                height: fullHeight,
+                x: 0,
+                y: 0,
+                scrollX: 0,
+                scrollY: 0,
             });
 
             if (downloadBtn) downloadBtn.style.display = 'flex';
 
             const imgData = canvas.toDataURL('image/png');
             const pdf = new jsPDF('p', 'mm', 'a4');
-            const imgProps = pdf.getImageProperties(imgData);
             const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+            const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
-            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+            // If content is taller than one A4 page, split across multiple pages
+            const pageHeightMM = pdf.internal.pageSize.getHeight();
+            if (pdfHeight <= pageHeightMM) {
+                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+            } else {
+                // Multi-page support: slice the canvas into A4-sized chunks
+                const pageHeightPx = Math.floor((canvas.width * pageHeightMM) / pdfWidth);
+                let yOffset = 0;
+                while (yOffset < canvas.height) {
+                    const sliceHeight = Math.min(pageHeightPx, canvas.height - yOffset);
+                    const pageCanvas = document.createElement('canvas');
+                    pageCanvas.width = canvas.width;
+                    pageCanvas.height = sliceHeight;
+                    const ctx = pageCanvas.getContext('2d');
+                    ctx.drawImage(canvas, 0, yOffset, canvas.width, sliceHeight, 0, 0, canvas.width, sliceHeight);
+                    const pageImg = pageCanvas.toDataURL('image/png');
+                    const sliceHeightMM = (sliceHeight * pdfWidth) / canvas.width;
+                    if (yOffset > 0) pdf.addPage();
+                    pdf.addImage(pageImg, 'PNG', 0, 0, pdfWidth, sliceHeightMM);
+                    yOffset += sliceHeight;
+                }
+            }
+
             pdf.save(`${record.name}_${record.registerNumber}_Marks.pdf`);
 
             Swal.close();
@@ -91,6 +131,7 @@ const User = () => {
             });
         } catch (error) {
             console.error('PDF generation error:', error);
+            if (downloadBtn) downloadBtn.style.display = 'flex';
             Swal.fire({
                 icon: 'error',
                 title: 'Download Failed',
