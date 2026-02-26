@@ -27,6 +27,7 @@ mongoose.connect(MONGO_URI)
 // Schema
 const StudentMarkSchema = new mongoose.Schema({
     name: { type: String, required: true },
+    fatherName: { type: String, required: false },
     registerNumber: { type: String, required: true },
     className: { type: String, required: true },
     examType: { type: String, required: true },
@@ -44,10 +45,10 @@ const StudentMark = mongoose.models.StudentMark || mongoose.model('StudentMark',
 // Admin: Add Mark
 app.post('/api/admin/add-mark', async (req, res) => {
     try {
-        const { name, registerNumber, className, examType, subjects } = req.body;
+        const { name, fatherName, registerNumber, className, examType, subjects } = req.body;
 
         if (!name || !registerNumber || !className || !examType) {
-            return res.status(400).json({ message: 'All required fields must be provided' });
+            return res.status(400).json({ message: 'All required fields (Name, Register Number, Class, Exam Type) must be provided' });
         }
 
         const regNo = registerNumber.trim();
@@ -64,6 +65,7 @@ app.post('/api/admin/add-mark', async (req, res) => {
 
         const newMark = new StudentMark({
             name: name.trim(),
+            fatherName: fatherName ? fatherName.trim() : '',
             registerNumber: regNo,
             className: className.trim(),
             examType: exam,
@@ -82,13 +84,14 @@ app.post('/api/admin/add-mark', async (req, res) => {
 app.put('/api/admin/update-mark/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, registerNumber, className, examType, subjects } = req.body;
+        const { name, fatherName, registerNumber, className, examType, subjects } = req.body;
 
         // Filter out empty subjects
         const validSubjects = subjects.filter(sub => sub.subjectName && sub.mark !== '' && sub.mark !== null);
 
         const updatedMark = await StudentMark.findByIdAndUpdate(id, {
             name,
+            fatherName,
             registerNumber,
             className,
             examType,
@@ -130,7 +133,7 @@ app.get('/api/health', (req, res) => {
 app.post('/api/admin/login', (req, res) => {
     const { password } = req.body;
     // Hardcoded password for simplicity as requested
-    if (password === 'admin123') {
+    if (password === '1156') {
         res.json({ success: true });
     } else {
         res.status(401).json({ success: false, message: 'Invalid password' });
@@ -140,22 +143,16 @@ app.post('/api/admin/login', (req, res) => {
 // User: Check Mark
 app.post('/api/user/check-mark', async (req, res) => {
     try {
-        const { registerNumber, name } = req.body;
+        const { registerNumber } = req.body;
 
-        if (!registerNumber || !name) {
-            return res.status(400).json({ message: 'Register number and name are required' });
+        if (!registerNumber) {
+            return res.status(400).json({ message: 'Register number is required' });
         }
 
         const regNo = registerNumber.trim();
-        const studentName = name.trim();
 
-        // Escape regex special characters to prevent errors
-        const escapedName = studentName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
-        // Case insensitive search
         const students = await StudentMark.find({
-            registerNumber: regNo,
-            name: { $regex: new RegExp(`^${escapedName}$`, 'i') }
+            registerNumber: regNo
         });
 
         if (students && students.length > 0) {

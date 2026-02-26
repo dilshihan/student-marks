@@ -4,7 +4,7 @@ import Swal from 'sweetalert2';
 
 const Admin = () => {
     const [mode, setMode] = useState('add'); // 'add' or 'edit'
-    const [search, setSearch] = useState({ registerNumber: '', name: '' });
+    const [search, setSearch] = useState({ registerNumber: '' });
     const [searchResults, setSearchResults] = useState([]);
     const [editingId, setEditingId] = useState(null);
     const [allRecords, setAllRecords] = useState([]);
@@ -14,6 +14,7 @@ const Admin = () => {
 
     const [formData, setFormData] = useState({
         name: '',
+        fatherName: '',
         registerNumber: '',
         className: '',
         examType: 'Internal / Series Exam',
@@ -23,6 +24,7 @@ const Admin = () => {
     const resetForm = () => {
         setFormData({
             name: '',
+            fatherName: '',
             registerNumber: '',
             className: '',
             examType: 'Internal / Series Exam',
@@ -73,6 +75,7 @@ const Admin = () => {
         setEditingId(record._id);
         setFormData({
             name: record.name,
+            fatherName: record.fatherName,
             registerNumber: record.registerNumber,
             className: record.className,
             examType: record.examType,
@@ -142,26 +145,17 @@ const Admin = () => {
             {mode === 'edit' && !editingId && (
                 <div style={{ marginBottom: '2rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '2rem' }}>
                     <h3>Find Student to Edit</h3>
-                    <form onSubmit={handleSearch} className="responsive-grid" style={{ gap: '1rem' }}>
+                    <form onSubmit={handleSearch} style={{ display: 'flex', gap: '1rem' }}>
                         <input
                             className="input-field"
                             name="registerNumber"
                             placeholder="Register Number"
                             value={search.registerNumber}
-                            onChange={(e) => setSearch({ ...search, registerNumber: e.target.value })}
-                            style={{ marginBottom: 0 }}
+                            onChange={(e) => setSearch({ registerNumber: e.target.value })}
+                            style={{ marginBottom: 0, flex: 1 }}
                             required
                         />
-                        <input
-                            className="input-field"
-                            name="name"
-                            placeholder="Student Name"
-                            value={search.name}
-                            onChange={(e) => setSearch({ ...search, name: e.target.value })}
-                            style={{ marginBottom: 0 }}
-                            required
-                        />
-                        <button type="submit" className="btn-primary" style={{ gridColumn: 'span 1' }}>Search</button>
+                        <button type="submit" className="btn-primary" style={{ padding: '0 2rem' }}>Search</button>
                     </form>
 
                     {searchResults.length > 0 && (
@@ -170,6 +164,7 @@ const Admin = () => {
                                 <div key={result._id} className="glass-card" style={{ padding: '1rem', marginTop: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <div style={{ textAlign: 'left' }}>
                                         <strong>{result.name}</strong> ({result.registerNumber}) <br />
+                                        {result.fatherName && <><small>Father: {result.fatherName}</small> <br /></>}
                                         <small>{result.examType} - {result.className}</small>
                                     </div>
                                     <button className="btn-primary" onClick={() => handleEdit(result)}>Edit</button>
@@ -207,6 +202,7 @@ const Admin = () => {
                                             <div key={record._id} className="glass-card" style={{ padding: '1rem', marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                                 <div style={{ textAlign: 'left' }}>
                                                     <strong>{record.name}</strong> <br />
+                                                    {record.fatherName && <><small>Father: {record.fatherName}</small> <br /></>}
                                                     <small>Reg: {record.registerNumber}</small>
                                                 </div>
                                                 <div style={{ textAlign: 'right' }}>
@@ -255,11 +251,13 @@ const Admin = () => {
                     <form onSubmit={handleSubmit}>
                         <div className="responsive-grid" style={{ marginBottom: '1rem' }}>
                             <input className="input-field" name="name" placeholder="Student Name" value={formData.name} onChange={handleChange} style={{ marginBottom: 0 }} required />
-                            <input className="input-field" name="registerNumber" placeholder="Register Number" value={formData.registerNumber} onChange={handleChange} style={{ marginBottom: 0 }} required />
+                            <input className="input-field" name="fatherName" placeholder="Father Name (Optional)" value={formData.fatherName} onChange={handleChange} style={{ marginBottom: 0 }} />
                         </div>
-
                         <div className="responsive-grid" style={{ marginBottom: '1rem' }}>
+                            <input className="input-field" name="registerNumber" placeholder="Register Number" value={formData.registerNumber} onChange={handleChange} style={{ marginBottom: 0 }} required />
                             <input className="input-field" name="className" placeholder="Class" value={formData.className} onChange={handleChange} style={{ marginBottom: 0 }} required />
+                        </div>
+                        <div style={{ marginBottom: '1rem' }}>
                             <select className="input-field" name="examType" value={formData.examType} onChange={handleChange} style={{ appearance: 'none', marginBottom: 0 }}>
                                 <option value="Internal / Series Exam" style={{ color: 'black' }}>Internal / Series Exam</option>
                                 <option value="Model Exam" style={{ color: 'black' }}>Model Exam</option>
