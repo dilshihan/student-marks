@@ -70,7 +70,8 @@ const User = () => {
 
             // Get the full dimensions of the element (not viewport-limited)
             const fullWidth = element.scrollWidth;
-            const fullHeight = element.scrollHeight;
+            // Use offsetHeight for tight fit with no extra blank space
+            const fullHeight = element.offsetHeight;
 
             // Use a fixed desktop width so subject names never wrap on mobile
             const fixedWidth = Math.max(fullWidth, 900);
@@ -184,13 +185,19 @@ const User = () => {
                         </div>
 
                         <div className="table-responsive">
-                            <table className="results-table">
+                            <table className="results-table" style={{ tableLayout: 'fixed', width: '100%' }}>
+                                <colgroup>
+                                    <col style={{ width: '40%' }} />
+                                    <col style={{ width: '20%' }} />
+                                    <col style={{ width: '20%' }} />
+                                    <col style={{ width: '20%' }} />
+                                </colgroup>
                                 <thead>
                                     <tr>
-                                        <th style={{ width: '40%', border: '1px solid #eee' }}>Subject</th>
-                                        <th style={{ textAlign: 'center', width: '20%', border: '1px solid #eee' }}>Max Mark</th>
-                                        <th style={{ textAlign: 'center', width: '20%', border: '1px solid #eee' }}>Earned Mark</th>
-                                        <th style={{ textAlign: 'right', width: '20%', border: '1px solid #eee' }}>Grade</th>
+                                        <th style={{ border: '1px solid #eee', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Subject</th>
+                                        <th style={{ textAlign: 'center', border: '1px solid #eee', whiteSpace: 'nowrap' }}>Max Mark</th>
+                                        <th style={{ textAlign: 'center', border: '1px solid #eee', whiteSpace: 'nowrap' }}>Earned Mark</th>
+                                        <th style={{ textAlign: 'right', border: '1px solid #eee', whiteSpace: 'nowrap' }}>Grade</th>
                                     </tr>
                                 </thead>
                                 <tbody>
