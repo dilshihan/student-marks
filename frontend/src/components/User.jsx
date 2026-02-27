@@ -72,16 +72,17 @@ const User = () => {
             const fullWidth = element.scrollWidth;
             const fullHeight = element.scrollHeight;
 
+            // Use a fixed desktop width so subject names never wrap on mobile
+            const fixedWidth = Math.max(fullWidth, 900);
+
             const canvas = await html2canvas(element, {
                 scale: 2,                    // Higher scale for better quality
                 useCORS: true,
                 backgroundColor: '#ffffff',
-                // Tell html2canvas the full element size, not the viewport size.
-                // This is the key fix for mobile where the viewport is smaller
-                // than the element and causes partial captures.
-                windowWidth: fullWidth,
+                // Force a minimum desktop-width capture so text doesn't wrap on mobile
+                windowWidth: fixedWidth,
                 windowHeight: fullHeight,
-                width: fullWidth,
+                width: fixedWidth,
                 height: fullHeight,
                 x: 0,
                 y: 0,
@@ -197,7 +198,7 @@ const User = () => {
                                         const isSubjectFailed = Number(sub.mark) < 18;
                                         return (
                                             <tr key={sIdx}>
-                                                <td style={{ border: '1px solid #eee' }}>{sub.subjectName}</td>
+                                                <td style={{ border: '1px solid #eee', whiteSpace: 'nowrap' }}>{sub.subjectName}</td>
                                                 <td style={{ textAlign: 'center', border: '1px solid #eee' }}>50</td>
                                                 <td style={{
                                                     textAlign: 'center',
