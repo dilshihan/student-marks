@@ -30,10 +30,19 @@ body {
 
 #root {
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  text-align: center;
+}
+
+.page-wrapper {
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem 1rem;
-  text-align: center;
+  flex: 1;
+  box-sizing: border-box;
 }
 
 h1,
@@ -133,11 +142,14 @@ h3,
   background: white;
   border-radius: 2rem;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-  display: inline-flex;
+  display: flex;
   flex-wrap: wrap;
   justify-content: center;
+  align-items: center;
   gap: 1.5rem;
   border: 1px solid var(--glass-border);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .responsive-grid {
@@ -160,9 +172,10 @@ h3,
   }
 
   .nav-container {
-    display: flex;
     gap: 1rem;
     padding: 0.75rem 1rem;
+    border-radius: 1rem;
+    margin-bottom: 2rem;
   }
 
   .table-responsive {
@@ -179,6 +192,10 @@ h3,
   td {
     padding: 0.75rem 0.5rem;
     font-size: 0.9rem;
+  }
+
+  .footer {
+    padding: 1.5rem 1rem;
   }
 }
 
@@ -266,35 +283,55 @@ tr:hover td {
 
 /* Footer Overhaul */
 .footer {
-  margin-top: auto;
-  padding: 3rem 0;
+  width: 100%;
+  padding: 2rem 1rem;
   background: white;
   border-top: 1px solid var(--glass-border);
+  box-sizing: border-box;
+  margin-top: 2rem;
 }
 
 .footer-content {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
   color: var(--text-muted);
+  text-align: center;
+  flex-wrap: wrap;
+}
+
+.footer-content p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.developer-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .dev-name {
   color: var(--primary);
   font-weight: 700;
   font-family: var(--header-font);
-  font-size: 1.2rem;
+  font-size: 1.1rem;
 }
 
 .social-links {
   display: flex;
-  gap: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
 }
 
 .social-link {
   color: var(--text-muted);
   transition: all 0.3s ease;
+  font-size: 0.9rem;
+  white-space: nowrap;
 }
 
 .social-link:hover {
@@ -302,11 +339,16 @@ tr:hover td {
   transform: scale(1.1);
 }
 
+.separator {
+  color: var(--glass-border);
+}
+
 /* App Container */
 .app {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  width: 100%;
 }
 
 /* Scrollbar */

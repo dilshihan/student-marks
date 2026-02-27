@@ -28,22 +28,24 @@ function App() {
   return (
     <Router>
       <div className="app">
-        <h1 className="title">Student Result System</h1>
-        <Navigation />
-        <Routes>
-          <Route path="/" element={<User />} />
-          <Route path="/login" element={<Login />} />
-          <Route
-            path="/admin/dashboard"
-            element={
-              <ProtectedRoute>
-                <Admin />
-              </ProtectedRoute>
-            }
-          />
-          {/* Redirect old admin route for compatibility or catch-all */}
-          <Route path="/admin" element={<Navigate to="/admin/dashboard" />} />
-        </Routes>
+        <div className="page-wrapper">
+          <h1 className="title">Student Result System</h1>
+          <Navigation />
+          <Routes>
+            <Route path="/" element={<User />} />
+            <Route path="/login" element={<Login />} />
+            <Route
+              path="/admin/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Admin />
+                </ProtectedRoute>
+              }
+            />
+            {/* Redirect old admin route for compatibility or catch-all */}
+            <Route path="/admin" element={<Navigate to="/admin/dashboard" />} />
+          </Routes>
+        </div>
         <Footer />
       </div>
     </Router>
