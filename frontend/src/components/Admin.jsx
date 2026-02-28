@@ -2,6 +2,48 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 
+// Map Arabic class numbers to Roman numerals
+const arabicToRoman = {
+    '1': 'I', '2': 'II', '3': 'III', '4': 'IV', '5': 'V',
+    '6': 'VI', '7': 'VII', '8': 'VIII', '9': 'IX', '10': 'X',
+    '11': 'XI', '12': 'XII'
+};
+
+// Map Roman numerals back to Arabic for reverse lookup
+const romanToArabic = {
+    'I': '1', 'II': '2', 'III': '3', 'IV': '4', 'V': '5',
+    'VI': '6', 'VII': '7', 'VIII': '8', 'IX': '9', 'X': '10',
+    'XI': '11', 'XII': '12'
+};
+
+// Convert a className like "10A" or "10" to display "X" or "XA"
+const toRomanClass = (className) => {
+    if (!className) return className;
+    const match = className.match(/^(\d+)(.*)$/);
+    if (match) {
+        const num = match[1];
+        const suffix = match[2];
+        return (arabicToRoman[num] || num) + suffix;
+    }
+    return className;
+};
+
+// Check if a className matches a Roman numeral filter
+const classMatchesFilter = (className, filter) => {
+    if (!filter) return true;
+    const f = filter.trim().toUpperCase();
+    // Direct match with stored class name (Arabic)
+    if (className?.toLowerCase().includes(filter.toLowerCase())) return true;
+    // Roman numeral: convert filter roman to arabic and check
+    const arabicEquiv = romanToArabic[f];
+    if (arabicEquiv) {
+        return className?.toLowerCase().includes(arabicEquiv.toLowerCase());
+    }
+    // Also match display roman class
+    const romanDisplay = toRomanClass(className || '').toUpperCase();
+    return romanDisplay.includes(f);
+};
+
 const Admin = () => {
     const [mode, setMode] = useState('add'); // 'add' or 'edit'
     const [search, setSearch] = useState({ registerNumber: '' });
@@ -9,6 +51,7 @@ const Admin = () => {
     const [editingId, setEditingId] = useState(null);
     const [allRecords, setAllRecords] = useState([]);
     const [classFilter, setClassFilter] = useState('');
+    const [expandedClass, setExpandedClass] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
 
@@ -181,80 +224,156 @@ const Admin = () => {
                     <div style={{ marginBottom: '1rem', marginTop: '1rem' }}>
                         <input
                             className="input-field"
-                            placeholder="Filter by Class (e.g. 10A)"
+                            placeholder="Search by Class (Roman numeral e.g. I, II, X, XI)"
                             value={classFilter}
-                            onChange={(e) => { setClassFilter(e.target.value); setCurrentPage(1); }}
+                            onChange={(e) => { setClassFilter(e.target.value); setExpandedClass(null); }}
                             style={{ width: '100%' }}
                         />
                     </div>
-                    <div style={{ maxHeight: '700px', overflowY: 'auto' }}>
-                        {(() => {
-                            const filtered = allRecords.filter(r =>
-                                !classFilter || r.className?.toLowerCase().includes(classFilter.toLowerCase())
-                            );
-                            const totalPages = Math.ceil(filtered.length / itemsPerPage);
-                            const paginated = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
-                            if (paginated.length > 0) {
-                                return (
-                                    <>
-                                        {paginated.map(record => (
-                                            <div key={record._id} className="glass-card" style={{ padding: '1rem', marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                <div style={{ textAlign: 'left' }}>
-                                                    <strong>{record.name}</strong> <br />
-                                                    {record.fatherName && <><small>Father: {record.fatherName}</small> <br /></>}
-                                                    <small>Reg: {record.registerNumber}</small>
+                    {(() => {
+                        const filtered = allRecords.filter(r => classMatchesFilter(r.className, classFilter));
+
+                        const groups = {};
+                        filtered.forEach(r => {
+                            const key = r.className || 'Unknown';
+                            if (!groups[key]) groups[key] = [];
+                            groups[key].push(r);
+                        });
+
+                        const classKeys = Object.keys(groups).sort((a, b) => {
+                            const numA = parseInt(a) || 999;
+                            const numB = parseInt(b) || 999;
+                            return numA - numB;
+                        });
+
+                        if (classKeys.length === 0) {
+                            return <p style={{ marginTop: '1rem', textAlign: 'center' }}>No records found.</p>;
+                        }
+
+                        return (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                {classKeys.map(cls => {
+                                    const students = groups[cls];
+                                    const isOpen = expandedClass === cls;
+                                    const romanLabel = toRomanClass(cls);
+
+                                    return (
+                                        <div key={cls} style={{
+                                            border: '1px solid rgba(99,102,241,0.3)',
+                                            borderRadius: '1rem',
+                                            overflow: 'hidden',
+                                            boxShadow: isOpen ? '0 4px 24px rgba(99,102,241,0.15)' : '0 1px 6px rgba(0,0,0,0.1)'
+                                        }}>
+                                            <button
+                                                onClick={() => setExpandedClass(isOpen ? null : cls)}
+                                                style={{
+                                                    width: '100%',
+                                                    display: 'flex',
+                                                    justifyContent: 'space-between',
+                                                    alignItems: 'center',
+                                                    padding: '1rem 1.5rem',
+                                                    background: isOpen
+                                                        ? 'linear-gradient(135deg, var(--primary, #6366f1), #818cf8)'
+                                                        : 'rgba(99,102,241,0.08)',
+                                                    border: 'none',
+                                                    cursor: 'pointer',
+                                                    transition: 'all 0.25s ease',
+                                                }}
+                                            >
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                                    <span style={{
+                                                        width: '2.8rem',
+                                                        height: '2.8rem',
+                                                        borderRadius: '50%',
+                                                        background: isOpen ? 'rgba(255,255,255,0.25)' : 'var(--primary, #6366f1)',
+                                                        color: '#fff',
+                                                        fontWeight: '800',
+                                                        fontSize: '0.9rem',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        letterSpacing: '0.05em',
+                                                        flexShrink: 0,
+                                                    }}>
+                                                        {romanLabel}
+                                                    </span>
+                                                    <div style={{ textAlign: 'left' }}>
+                                                        <div style={{
+                                                            fontWeight: '700',
+                                                            fontSize: '1.05rem',
+                                                            color: isOpen ? '#fff' : 'inherit'
+                                                        }}>
+                                                            Class {romanLabel}
+                                                        </div>
+                                                        <div style={{
+                                                            fontSize: '0.8rem',
+                                                            color: isOpen ? 'rgba(255,255,255,0.8)' : '#64748b'
+                                                        }}>
+                                                            {students.length} Student{students.length !== 1 ? 's' : ''}
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <div style={{ textAlign: 'right' }}>
-                                                    <small>{record.className}</small> <br />
-                                                    <small>{record.examType}</small> <br />
-                                                    {(() => {
+                                                <span style={{
+                                                    fontSize: '1.5rem',
+                                                    color: isOpen ? '#fff' : 'var(--primary, #6366f1)',
+                                                    transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)',
+                                                    transition: 'transform 0.25s ease',
+                                                    lineHeight: 1,
+                                                }}>
+                                                    ›
+                                                </span>
+                                            </button>
+
+                                            {isOpen && (
+                                                <div style={{ padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                                                    {students.map(record => {
                                                         const isPassed = record.subjects.length > 0 && record.subjects.every(sub => Number(sub.mark) >= 18);
                                                         return (
-                                                            <span style={{
-                                                                color: isPassed ? '#059669' : '#dc2626',
-                                                                fontWeight: 'bold',
-                                                                fontSize: '0.8rem',
-                                                                textTransform: 'uppercase'
-                                                            }}>
-                                                                {isPassed ? 'Passed' : 'Failed'}
-                                                            </span>
+                                                            <div
+                                                                key={record._id}
+                                                                className="glass-card"
+                                                                style={{
+                                                                    padding: '0.85rem 1rem',
+                                                                    display: 'flex',
+                                                                    justifyContent: 'space-between',
+                                                                    alignItems: 'center',
+                                                                    marginBottom: 0,
+                                                                    borderLeft: `3px solid ${isPassed ? '#059669' : '#dc2626'}`
+                                                                }}
+                                                            >
+                                                                <div style={{ textAlign: 'left' }}>
+                                                                    <strong style={{ fontSize: '0.95rem' }}>{record.name}</strong>
+                                                                    {record.fatherName && (
+                                                                        <><br /><small style={{ color: '#64748b' }}>Father: {record.fatherName}</small></>
+                                                                    )}
+                                                                    <br />
+                                                                    <small style={{ color: '#64748b' }}>Reg: {record.registerNumber}</small>
+                                                                </div>
+                                                                <div style={{ textAlign: 'right' }}>
+                                                                    <small style={{ display: 'block', color: '#64748b' }}>{record.examType}</small>
+                                                                    <span style={{
+                                                                        color: isPassed ? '#059669' : '#dc2626',
+                                                                        fontWeight: 'bold',
+                                                                        fontSize: '0.8rem',
+                                                                        textTransform: 'uppercase',
+                                                                        marginTop: '0.25rem',
+                                                                        display: 'block'
+                                                                    }}>
+                                                                        {isPassed ? '✓ Passed' : '✗ Failed'}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
                                                         );
-                                                    })()}
+                                                    })}
                                                 </div>
-                                            </div>
-                                        ))}
-
-                                        {totalPages > 1 && (
-                                            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', marginTop: '2rem', paddingBottom: '1rem' }}>
-                                                <button
-                                                    className="btn-primary"
-                                                    style={{ padding: '0.5rem 1rem', opacity: currentPage === 1 ? 0.5 : 1 }}
-                                                    disabled={currentPage === 1}
-                                                    onClick={() => setCurrentPage(prev => prev - 1)}
-                                                >
-                                                    Previous
-                                                </button>
-                                                <span style={{ fontWeight: 'bold', color: 'var(--primary)' }}>
-                                                    Page {currentPage} of {totalPages}
-                                                </span>
-                                                <button
-                                                    className="btn-primary"
-                                                    style={{ padding: '0.5rem 1rem', opacity: currentPage === totalPages ? 0.5 : 1 }}
-                                                    disabled={currentPage === totalPages}
-                                                    onClick={() => setCurrentPage(prev => prev + 1)}
-                                                >
-                                                    Next
-                                                </button>
-                                            </div>
-                                        )}
-                                    </>
-                                );
-                            } else {
-                                return <p style={{ marginTop: '1rem' }}>No records found for this class.</p>;
-                            }
-                        })()}
-                    </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        );
+                    })()}
                 </div>
             )}
 
