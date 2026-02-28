@@ -115,6 +115,7 @@ const Admin = () => {
     };
 
     const handleEdit = (record) => {
+        setMode('edit'); // Switch mode so the list hides and the form shows
         setEditingId(record._id);
         setFormData({
             name: record.name,
