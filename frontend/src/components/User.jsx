@@ -215,45 +215,49 @@ const User = () => {
                             </div>
                         )}
 
-                        <div className="table-responsive" style={{ marginTop: '1rem', border: '1px solid #f1f5f9', borderRadius: '0.75rem', overflow: 'hidden' }}>
-                            <table className="results-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+                        <div className="table-responsive" style={{ marginTop: '1rem', border: '1px solid #f1f5f9', borderRadius: '0.75rem', overflowX: 'auto' }}>
+                            <table className="results-table" style={{ width: '100%', minWidth: '320px', borderCollapse: 'collapse' }}>
                                 <thead>
                                     <tr style={{ background: '#f8fafc' }}>
                                         <th style={{
-                                            padding: '0.75rem 1rem',
+                                            padding: '0.75rem 0.5rem',
                                             border: '1px solid #eee',
                                             textAlign: 'left',
-                                            fontSize: '0.85rem',
+                                            fontSize: '0.75rem',
                                             fontWeight: '700',
                                             color: '#64748b',
-                                            textTransform: 'uppercase'
+                                            textTransform: 'uppercase',
+                                            width: '45%'
                                         }}>Subject</th>
                                         <th style={{
-                                            padding: '0.75rem 0.5rem',
+                                            padding: '0.75rem 0.25rem',
                                             border: '1px solid #eee',
                                             textAlign: 'center',
-                                            fontSize: '0.85rem',
+                                            fontSize: '0.75rem',
                                             fontWeight: '700',
                                             color: '#64748b',
-                                            textTransform: 'uppercase'
+                                            textTransform: 'uppercase',
+                                            width: '15%'
                                         }}>Max</th>
                                         <th style={{
-                                            padding: '0.75rem 0.5rem',
+                                            padding: '0.75rem 0.25rem',
                                             border: '1px solid #eee',
                                             textAlign: 'center',
-                                            fontSize: '0.85rem',
+                                            fontSize: '0.75rem',
                                             fontWeight: '700',
                                             color: '#64748b',
-                                            textTransform: 'uppercase'
+                                            textTransform: 'uppercase',
+                                            width: '15%'
                                         }}>Mark</th>
                                         <th style={{
-                                            padding: '0.75rem 0.5rem',
+                                            padding: '0.75rem 0.25rem',
                                             border: '1px solid #eee',
                                             textAlign: 'center',
-                                            fontSize: '0.85rem',
+                                            fontSize: '0.75rem',
                                             fontWeight: '700',
                                             color: '#64748b',
-                                            textTransform: 'uppercase'
+                                            textTransform: 'uppercase',
+                                            width: '25%'
                                         }}>Grade</th>
                                     </tr>
                                 </thead>
@@ -292,31 +296,37 @@ const User = () => {
                                     <tr style={{ background: 'rgba(6, 78, 59, 0.05)' }}>
                                         <td style={{
                                             fontWeight: '800',
-                                            padding: '0.75rem 1rem',
+                                            padding: '0.75rem 0.5rem',
                                             border: '1px solid #eee',
-                                            color: 'var(--primary)'
+                                            color: 'var(--primary)',
+                                            fontSize: '0.75rem'
                                         }}>TOTAL</td>
                                         <td style={{
                                             textAlign: 'center',
                                             fontWeight: '800',
                                             border: '1px solid #eee',
-                                            padding: '0.75rem 0.5rem'
+                                            padding: '0.75rem 0.25rem',
+                                            fontSize: '0.75rem'
                                         }}>{totalMax}</td>
                                         <td style={{
                                             textAlign: 'center',
                                             fontWeight: '800',
                                             color: 'var(--primary)',
                                             border: '1px solid #eee',
-                                            padding: '0.75rem 0.5rem'
+                                            padding: '0.75rem 0.25rem',
+                                            fontSize: '0.75rem'
                                         }}>{totalEarned}</td>
                                         <td style={{
                                             textAlign: 'center',
                                             fontWeight: '800',
                                             color: 'var(--primary)',
                                             border: '1px solid #eee',
-                                            padding: '0.75rem 0.5rem'
+                                            padding: '0.75rem 0.25rem',
+                                            fontSize: '0.75rem'
                                         }}>
-                                            {((totalEarned / totalMax) * 100).toFixed(1)}%
+                                            <span style={{ whiteSpace: 'nowrap' }}>
+                                                {((totalEarned / totalMax) * 100).toFixed(1)}%
+                                            </span>
                                         </td>
                                     </tr>
                                 </tbody>
