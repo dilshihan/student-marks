@@ -215,20 +215,46 @@ const User = () => {
                             </div>
                         )}
 
-                        <div className="table-responsive">
-                            <table className="results-table" style={{ tableLayout: 'fixed', width: '100%' }}>
-                                <colgroup>
-                                    <col style={{ width: '40%' }} />
-                                    <col style={{ width: '20%' }} />
-                                    <col style={{ width: '20%' }} />
-                                    <col style={{ width: '20%' }} />
-                                </colgroup>
+                        <div className="table-responsive" style={{ marginTop: '1rem', border: '1px solid #f1f5f9', borderRadius: '0.75rem', overflow: 'hidden' }}>
+                            <table className="results-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
                                 <thead>
-                                    <tr>
-                                        <th style={{ border: '1px solid #eee', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Subject</th>
-                                        <th style={{ textAlign: 'center', border: '1px solid #eee', whiteSpace: 'nowrap' }}>Max Mark</th>
-                                        <th style={{ textAlign: 'center', border: '1px solid #eee', whiteSpace: 'nowrap' }}>Earned Mark</th>
-                                        <th style={{ textAlign: 'right', border: '1px solid #eee', whiteSpace: 'nowrap' }}>Grade</th>
+                                    <tr style={{ background: '#f8fafc' }}>
+                                        <th style={{
+                                            padding: '0.75rem 1rem',
+                                            border: '1px solid #eee',
+                                            textAlign: 'left',
+                                            fontSize: '0.85rem',
+                                            fontWeight: '700',
+                                            color: '#64748b',
+                                            textTransform: 'uppercase'
+                                        }}>Subject</th>
+                                        <th style={{
+                                            padding: '0.75rem 0.5rem',
+                                            border: '1px solid #eee',
+                                            textAlign: 'center',
+                                            fontSize: '0.85rem',
+                                            fontWeight: '700',
+                                            color: '#64748b',
+                                            textTransform: 'uppercase'
+                                        }}>Max</th>
+                                        <th style={{
+                                            padding: '0.75rem 0.5rem',
+                                            border: '1px solid #eee',
+                                            textAlign: 'center',
+                                            fontSize: '0.85rem',
+                                            fontWeight: '700',
+                                            color: '#64748b',
+                                            textTransform: 'uppercase'
+                                        }}>Mark</th>
+                                        <th style={{
+                                            padding: '0.75rem 0.5rem',
+                                            border: '1px solid #eee',
+                                            textAlign: 'center',
+                                            fontSize: '0.85rem',
+                                            fontWeight: '700',
+                                            color: '#64748b',
+                                            textTransform: 'uppercase'
+                                        }}>Grade</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -236,28 +262,60 @@ const User = () => {
                                         const isSubjectFailed = Number(sub.mark) < 18;
                                         return (
                                             <tr key={sIdx}>
-                                                <td style={{ border: '1px solid #eee', whiteSpace: 'nowrap' }}>{sub.subjectName}</td>
-                                                <td style={{ textAlign: 'center', border: '1px solid #eee' }}>50</td>
+                                                <td style={{
+                                                    padding: '0.75rem 1rem',
+                                                    border: '1px solid #eee',
+                                                    fontWeight: '500'
+                                                }}>{sub.subjectName}</td>
+                                                <td style={{
+                                                    textAlign: 'center',
+                                                    border: '1px solid #eee',
+                                                    padding: '0.75rem 0.5rem'
+                                                }}>50</td>
                                                 <td style={{
                                                     textAlign: 'center',
                                                     fontWeight: 'bold',
                                                     color: isSubjectFailed ? '#dc2626' : 'var(--primary)',
-                                                    border: '1px solid #eee'
+                                                    border: '1px solid #eee',
+                                                    padding: '0.75rem 0.5rem'
                                                 }}>{sub.mark}</td>
                                                 <td style={{
-                                                    textAlign: 'right',
+                                                    textAlign: 'center',
                                                     fontWeight: 'bold',
                                                     color: isSubjectFailed ? '#dc2626' : 'inherit',
-                                                    border: '1px solid #eee'
+                                                    border: '1px solid #eee',
+                                                    padding: '0.75rem 0.5rem'
                                                 }}>{getGrade(sub.mark)}</td>
                                             </tr>
                                         );
                                     })}
-                                    <tr style={{ borderTop: '2px solid var(--primary)', background: 'rgba(6, 78, 59, 0.05)' }}>
-                                        <td style={{ fontWeight: 'bold', fontSize: '1.1rem', border: '1px solid #eee' }}>Total</td>
-                                        <td style={{ textAlign: 'center', fontWeight: 'bold', border: '1px solid #eee' }}>{totalMax}</td>
-                                        <td style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '1.2rem', color: 'var(--primary)', border: '1px solid #eee' }}>{totalEarned}</td>
-                                        <td style={{ textAlign: 'right', fontWeight: 'bold', color: 'var(--primary)', border: '1px solid #eee' }}>
+                                    <tr style={{ background: 'rgba(6, 78, 59, 0.05)' }}>
+                                        <td style={{
+                                            fontWeight: '800',
+                                            padding: '0.75rem 1rem',
+                                            border: '1px solid #eee',
+                                            color: 'var(--primary)'
+                                        }}>TOTAL</td>
+                                        <td style={{
+                                            textAlign: 'center',
+                                            fontWeight: '800',
+                                            border: '1px solid #eee',
+                                            padding: '0.75rem 0.5rem'
+                                        }}>{totalMax}</td>
+                                        <td style={{
+                                            textAlign: 'center',
+                                            fontWeight: '800',
+                                            color: 'var(--primary)',
+                                            border: '1px solid #eee',
+                                            padding: '0.75rem 0.5rem'
+                                        }}>{totalEarned}</td>
+                                        <td style={{
+                                            textAlign: 'center',
+                                            fontWeight: '800',
+                                            color: 'var(--primary)',
+                                            border: '1px solid #eee',
+                                            padding: '0.75rem 0.5rem'
+                                        }}>
                                             {((totalEarned / totalMax) * 100).toFixed(1)}%
                                         </td>
                                     </tr>
