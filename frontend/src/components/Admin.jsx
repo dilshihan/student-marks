@@ -61,6 +61,8 @@ const Admin = () => {
         registerNumber: '',
         className: '',
         examType: 'Internal / Series Exam',
+        totalWorkingDays: '',
+        totalWorkingDaysAttended: '',
         subjects: Array(7).fill({ subjectName: '', mark: '' })
     });
 
@@ -71,6 +73,8 @@ const Admin = () => {
             registerNumber: '',
             className: '',
             examType: 'Internal / Series Exam',
+            totalWorkingDays: '',
+            totalWorkingDaysAttended: '',
             subjects: Array(7).fill({ subjectName: '', mark: '' })
         });
         setEditingId(null);
@@ -123,10 +127,42 @@ const Admin = () => {
             registerNumber: record.registerNumber,
             className: record.className,
             examType: record.examType,
+            totalWorkingDays: record.totalWorkingDays || '',
+            totalWorkingDaysAttended: record.totalWorkingDaysAttended || '',
             subjects: record.subjects.length >= 7 ? record.subjects.slice(0, 7) :
                 [...record.subjects, ...Array(7 - record.subjects.length).fill({ subjectName: '', mark: '' })]
         });
         setSearchResults([]); // Clear search results to show form
+    };
+
+    const handleDelete = async (id) => {
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        });
+
+        if (result.isConfirmed) {
+            try {
+                await axios.delete(`/api/admin/delete-mark/${id}`);
+                Swal.fire(
+                    'Deleted!',
+                    'Record has been deleted.',
+                    'success'
+                );
+                fetchAllRecords();
+            } catch (error) {
+                Swal.fire(
+                    'Error!',
+                    'Failed to delete record.',
+                    'error'
+                );
+            }
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -351,18 +387,50 @@ const Admin = () => {
                                                                     <br />
                                                                     <small style={{ color: '#64748b' }}>Reg: {record.registerNumber}</small>
                                                                 </div>
-                                                                <div style={{ textAlign: 'right' }}>
-                                                                    <small style={{ display: 'block', color: '#64748b' }}>{record.examType}</small>
-                                                                    <span style={{
-                                                                        color: isPassed ? '#059669' : '#dc2626',
-                                                                        fontWeight: 'bold',
-                                                                        fontSize: '0.8rem',
-                                                                        textTransform: 'uppercase',
-                                                                        marginTop: '0.25rem',
-                                                                        display: 'block'
-                                                                    }}>
-                                                                        {isPassed ? '✓ Passed' : '✗ Failed'}
-                                                                    </span>
+                                                                <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.5rem' }}>
+                                                                    <div>
+                                                                        <small style={{ display: 'block', color: '#64748b' }}>{record.examType}</small>
+                                                                        <span style={{
+                                                                            color: isPassed ? '#059669' : '#dc2626',
+                                                                            fontWeight: 'bold',
+                                                                            fontSize: '0.8rem',
+                                                                            textTransform: 'uppercase',
+                                                                            marginTop: '0.25rem',
+                                                                            display: 'block'
+                                                                        }}>
+                                                                            {isPassed ? '✓ Passed' : '✗ Failed'}
+                                                                        </span>
+                                                                    </div>
+                                                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                                                        <button
+                                                                            onClick={() => handleEdit(record)}
+                                                                            style={{
+                                                                                padding: '0.3rem 0.6rem',
+                                                                                fontSize: '0.75rem',
+                                                                                background: 'rgba(99,102,241,0.1)',
+                                                                                color: 'var(--primary, #6366f1)',
+                                                                                border: '1px solid var(--primary, #6366f1)',
+                                                                                borderRadius: '0.4rem',
+                                                                                cursor: 'pointer'
+                                                                            }}
+                                                                        >
+                                                                            Edit
+                                                                        </button>
+                                                                        <button
+                                                                            onClick={() => handleDelete(record._id)}
+                                                                            style={{
+                                                                                padding: '0.3rem 0.6rem',
+                                                                                fontSize: '0.75rem',
+                                                                                background: 'rgba(220,38,38,0.1)',
+                                                                                color: '#dc2626',
+                                                                                border: '1px solid #dc2626',
+                                                                                borderRadius: '0.4rem',
+                                                                                cursor: 'pointer'
+                                                                            }}
+                                                                        >
+                                                                            Delete
+                                                                        </button>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         );
@@ -389,6 +457,10 @@ const Admin = () => {
                         <div className="responsive-grid" style={{ marginBottom: '1rem' }}>
                             <input className="input-field" name="registerNumber" placeholder="Register Number" value={formData.registerNumber} onChange={handleChange} style={{ marginBottom: 0 }} required />
                             <input className="input-field" name="className" placeholder="Class" value={formData.className} onChange={handleChange} style={{ marginBottom: 0 }} required />
+                        </div>
+                        <div className="responsive-grid" style={{ marginBottom: '1rem' }}>
+                            <input className="input-field" type="number" name="totalWorkingDays" placeholder="Total Working Days" value={formData.totalWorkingDays} onChange={handleChange} style={{ marginBottom: 0 }} />
+                            <input className="input-field" type="number" name="totalWorkingDaysAttended" placeholder="Total Working Days Student Attended" value={formData.totalWorkingDaysAttended} onChange={handleChange} style={{ marginBottom: 0 }} />
                         </div>
                         <div style={{ marginBottom: '1rem' }}>
                             <select className="input-field" name="examType" value={formData.examType} onChange={handleChange} style={{ appearance: 'none', marginBottom: 0 }}>

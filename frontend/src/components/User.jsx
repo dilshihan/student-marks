@@ -184,6 +184,37 @@ const User = () => {
                             </div>
                         </div>
 
+                        {/* Attendance Summary */}
+                        {(record.totalWorkingDays > 0 || record.totalWorkingDaysAttended > 0) && (
+                            <div style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+                                gap: '1rem',
+                                marginBottom: '1.5rem',
+                                padding: '1rem',
+                                background: 'rgba(6, 78, 59, 0.03)',
+                                borderRadius: '0.8rem',
+                                border: '1px solid rgba(6, 78, 59, 0.1)'
+                            }}>
+                                <div style={{ textAlign: 'center' }}>
+                                    <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b', textTransform: 'uppercase', fontWeight: '600' }}>Total Working Days</p>
+                                    <p style={{ margin: '0.2rem 0 0', fontSize: '1.25rem', fontWeight: '700', color: 'var(--primary)' }}>{record.totalWorkingDays || 0}</p>
+                                </div>
+                                <div style={{ textAlign: 'center' }}>
+                                    <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b', textTransform: 'uppercase', fontWeight: '600' }}>Attended Days</p>
+                                    <p style={{ margin: '0.2rem 0 0', fontSize: '1.25rem', fontWeight: '700', color: 'var(--primary)' }}>{record.totalWorkingDaysAttended || 0}</p>
+                                </div>
+                                <div style={{ textAlign: 'center' }}>
+                                    <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b', textTransform: 'uppercase', fontWeight: '600' }}>Percentage</p>
+                                    <p style={{ margin: '0.2rem 0 0', fontSize: '1.25rem', fontWeight: '700', color: 'var(--primary)' }}>
+                                        {record.totalWorkingDays > 0
+                                            ? ((record.totalWorkingDaysAttended / record.totalWorkingDays) * 100).toFixed(1) + '%'
+                                            : '0%'}
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+
                         <div className="table-responsive">
                             <table className="results-table" style={{ tableLayout: 'fixed', width: '100%' }}>
                                 <colgroup>

@@ -33,6 +33,8 @@ const StudentMarkSchema = new mongoose.Schema({
     registerNumber: { type: String, required: true },
     className: { type: String, required: true },
     examType: { type: String, required: true },
+    totalWorkingDays: { type: Number, required: false },
+    totalWorkingDaysAttended: { type: Number, required: false },
     subjects: [{
         subjectName: { type: String, required: true },
         mark: { type: Number, required: true }
@@ -47,7 +49,7 @@ const StudentMark = mongoose.models.StudentMark || mongoose.model('StudentMark',
 // Admin: Add Mark
 app.post('/api/admin/add-mark', async (req, res) => {
     try {
-        const { name, fatherName, registerNumber, className, examType, subjects } = req.body;
+        const { name, fatherName, registerNumber, className, examType, subjects, totalWorkingDays, totalWorkingDaysAttended } = req.body;
 
         if (!name || !registerNumber || !className || !examType) {
             return res.status(400).json({ message: 'All required fields (Name, Register Number, Class, Exam Type) must be provided' });
@@ -71,6 +73,8 @@ app.post('/api/admin/add-mark', async (req, res) => {
             registerNumber: regNo,
             className: className.trim(),
             examType: exam,
+            totalWorkingDays: totalWorkingDays || 0,
+            totalWorkingDaysAttended: totalWorkingDaysAttended || 0,
             subjects: validSubjects
         });
 
@@ -86,7 +90,7 @@ app.post('/api/admin/add-mark', async (req, res) => {
 app.put('/api/admin/update-mark/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, fatherName, registerNumber, className, examType, subjects } = req.body;
+        const { name, fatherName, registerNumber, className, examType, subjects, totalWorkingDays, totalWorkingDaysAttended } = req.body;
 
         // Filter out empty subjects
         const validSubjects = subjects.filter(sub => sub.subjectName && sub.mark !== '' && sub.mark !== null);
@@ -97,6 +101,8 @@ app.put('/api/admin/update-mark/:id', async (req, res) => {
             registerNumber,
             className,
             examType,
+            totalWorkingDays,
+            totalWorkingDaysAttended,
             subjects: validSubjects
         }, { new: true });
 
@@ -107,6 +113,22 @@ app.put('/api/admin/update-mark/:id', async (req, res) => {
         res.status(200).json({ message: 'Mark updated successfully', data: updatedMark });
     } catch (error) {
         res.status(500).json({ message: 'Error updating mark', error: error.message });
+    }
+});
+
+// Admin: Delete Mark
+app.delete('/api/admin/delete-mark/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const deletedMark = await StudentMark.findByIdAndDelete(id);
+
+        if (!deletedMark) {
+            return res.status(404).json({ message: 'Record not found' });
+        }
+
+        res.status(200).json({ message: 'Mark deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error deleting mark', error: error.message });
     }
 });
 
