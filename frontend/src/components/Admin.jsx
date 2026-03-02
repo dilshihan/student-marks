@@ -16,6 +16,18 @@ const romanToArabic = {
     'XI': '11', 'XII': '12'
 };
 
+const classSubjects = {
+    'I': ['TAFHEEM READING', 'THAFHEEM WRITING', 'DUROOS READING', 'DUROOS WRITING', 'DICTATION', 'DEENIYAT'],
+    'II': ['QURAN', 'HIFZ', 'FIQH', 'AQEEDA', 'DUROOS', 'LISAN'],
+    'III': ['QURAN', 'HIFZ', 'FIQH', 'THAREEQ', 'DUROOS', 'LISAN', 'AQEEDA'],
+    'IV': ['QURAN', 'HIFZ', 'FIQH', 'THAREEQ', 'DUROOS', 'LISAN', 'AQEEDA'],
+    'VI': ['QURAN', 'HIFZ', 'FIQH', 'DUROOS', 'THAREEQ', 'LISAN'],
+    'VIII': ['FIQH', 'DUROOS', 'LISAN', 'THAREEQ'],
+    'IX': ['FIQH', 'DUROOS', 'LISAN', 'THAREEQ'],
+    'XI': ['THAFSEER', 'FIQH', 'LISAN', 'DUROOS']
+};
+
+
 // Convert a className like "10A" or "10" to display "X" or "XA"
 const toRomanClass = (className) => {
     if (!className) return className;
@@ -53,7 +65,7 @@ const Admin = () => {
     const [classFilter, setClassFilter] = useState('');
     const [expandedClass, setExpandedClass] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10;
+    const itemsPerPage = 12;
 
     const [formData, setFormData] = useState({
         name: '',
@@ -84,9 +96,30 @@ const Admin = () => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    const handleClassChange = (e) => {
+        const romanClass = e.target.value;
+        const arabicClass = romanToArabic[romanClass] || romanClass;
+        const subjects = classSubjects[romanClass] || [];
+
+        // Fill the first N subjects with the class subjects, reset the rest
+        const newSubjects = Array(7).fill({ subjectName: '', mark: '' }).map((sub, i) => {
+            if (subjects[i]) {
+                return { subjectName: subjects[i], mark: '' };
+            }
+            return { subjectName: '', mark: '' };
+        });
+
+        setFormData(prev => ({
+            ...prev,
+            className: arabicClass,
+            subjects: newSubjects
+        }));
+    };
+
     const handleSubjectChange = (index, field, value) => {
         const newSubjects = [...formData.subjects];
-        newSubjects[index] = { ...newSubjects[index], [field]: value };
+        const updatedValue = field === 'subjectName' ? value.toUpperCase() : value;
+        newSubjects[index] = { ...newSubjects[index], [field]: updatedValue };
         setFormData({ ...formData, subjects: newSubjects });
     };
 
@@ -456,7 +489,19 @@ const Admin = () => {
                         </div>
                         <div className="responsive-grid" style={{ marginBottom: '1rem' }}>
                             <input className="input-field" name="registerNumber" placeholder="Register Number" value={formData.registerNumber} onChange={handleChange} style={{ marginBottom: 0 }} required />
-                            <input className="input-field" name="className" placeholder="Class" value={formData.className} onChange={handleChange} style={{ marginBottom: 0 }} required />
+                            <select
+                                className="input-field"
+                                name="className"
+                                value={toRomanClass(formData.className)}
+                                onChange={handleClassChange}
+                                style={{ marginBottom: 0, appearance: 'auto' }}
+                                required
+                            >
+                                <option value="" disabled>Select Class</option>
+                                {Object.keys(classSubjects).map(cls => (
+                                    <option key={cls} value={cls} style={{ color: 'black' }}>{cls}</option>
+                                ))}
+                            </select>
                         </div>
                         <div className="responsive-grid" style={{ marginBottom: '1rem' }}>
                             <input className="input-field" type="number" name="totalWorkingDays" placeholder="Total Working Days" value={formData.totalWorkingDays} onChange={handleChange} style={{ marginBottom: 0 }} />
@@ -479,7 +524,7 @@ const Admin = () => {
                                         placeholder={`Subject ${index + 1} Name`}
                                         value={subject.subjectName}
                                         onChange={(e) => handleSubjectChange(index, 'subjectName', e.target.value)}
-                                        style={{ marginBottom: 0 }}
+                                        style={{ marginBottom: 0, textTransform: 'uppercase' }}
                                     // Not required
                                     />
                                     <input

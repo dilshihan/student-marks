@@ -29,7 +29,7 @@ function App() {
     <Router>
       <div className="app">
         <div className="page-wrapper">
-          <h1 className="title">Student Result System</h1>
+          <h1 className="title">HAM Kodakkad East Student Result Portal</h1>
           <Navigation />
           <Routes>
             <Route path="/" element={<User />} />
