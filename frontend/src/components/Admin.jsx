@@ -21,10 +21,14 @@ const classSubjects = {
     'II': ['QURAN', 'HIFZ', 'FIQH', 'AQEEDA', 'DUROOS', 'LISAN'],
     'III': ['QURAN', 'HIFZ', 'FIQH', 'THAREEQ', 'DUROOS', 'LISAN', 'AQEEDA'],
     'IV': ['QURAN', 'HIFZ', 'FIQH', 'THAREEQ', 'DUROOS', 'LISAN', 'AQEEDA'],
+    'V': ['QURAN', 'HIFZ', 'FIQH', 'AQEEDA', 'THAJWEED', 'THAREEQ', 'LISAN'],
     'VI': ['QURAN', 'HIFZ', 'FIQH', 'DUROOS', 'THAREEQ', 'LISAN'],
+    'VII': ['QURAN', 'HIFZ', 'FIQH', 'DUROOS', 'THAREEQ', 'LISAN'],
     'VIII': ['FIQH', 'DUROOS', 'LISAN', 'THAREEQ'],
     'IX': ['FIQH', 'DUROOS', 'LISAN', 'THAREEQ'],
-    'XI': ['THAFSEER', 'FIQH', 'LISAN', 'DUROOS']
+    'X': ['THAFSEER', 'FIQH', 'LISAN', 'DUROOS'],
+    'XI': ['THAFSEER', 'FIQH', 'LISAN', 'DUROOS'],
+    'XII': ['THAFSEER', 'FIQH', 'LISAN', 'DUROOS']
 };
 
 
