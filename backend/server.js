@@ -12,19 +12,41 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// MongoDB Connection
-const MONGO_URI = process.env.MONGO_URI;
+// MongoDB Connection Setup
+const connectDB = async () => {
+    // Check if we already have a connection
+    if (mongoose.connection.readyState >= 1) return;
 
-if (!MONGO_URI) {
-    console.error('CRITICAL: MONGO_URI is not defined in environment variables');
-}
+    const MONGO_URI = process.env.MONGO_URI;
+    if (!MONGO_URI) {
+        console.error('CRITICAL: MONGO_URI is not defined in environment variables');
+        throw new Error('MONGO_URI is missing');
+    }
 
-// Connect with options to handle serverless better
-mongoose.connect(MONGO_URI)
-    .then(() => console.log('MongoDB Connected Successfully'))
-    .catch(err => {
+    try {
+        await mongoose.connect(MONGO_URI, {
+            serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
+            connectTimeoutMS: 10000,
+        });
+        console.log('MongoDB Connected Successfully');
+    } catch (err) {
         console.error('MongoDB Connection Error:', err.message);
-    });
+        throw err;
+    }
+};
+
+// Middleware to ensure DB is connected before any API request
+app.use('/api', async (req, res, next) => {
+    try {
+        await connectDB();
+        next();
+    } catch (err) {
+        console.error('Database connection middleware error:', err);
+        res.status(500).json({ message: 'Database connection failed', error: err.message });
+    }
+});
+
+
 
 // Schema
 const StudentMarkSchema = new mongoose.Schema({
@@ -92,8 +114,10 @@ app.put('/api/admin/update-mark/:id', async (req, res) => {
         const { id } = req.params;
         const { name, fatherName, registerNumber, className, examType, subjects, totalWorkingDays, totalWorkingDaysAttended } = req.body;
 
-        // Filter out empty subjects
-        const validSubjects = subjects.filter(sub => sub.subjectName && sub.mark !== '' && sub.mark !== null);
+        // Filter out empty subjects safely
+        const validSubjects = subjects && Array.isArray(subjects)
+            ? subjects.filter(sub => sub.subjectName && sub.mark !== '' && sub.mark !== null)
+            : [];
 
         const updatedMark = await StudentMark.findByIdAndUpdate(id, {
             name,
@@ -173,7 +197,7 @@ app.post('/api/user/check-mark', async (req, res) => {
             return res.status(400).json({ message: 'Register number is required' });
         }
 
-        const regNo = registerNumber.trim();
+        const regNo = String(registerNumber).trim();
 
         const students = await StudentMark.find({
             registerNumber: regNo
@@ -188,6 +212,15 @@ app.post('/api/user/check-mark', async (req, res) => {
         console.error('Check mark error:', error);
         res.status(500).json({ message: 'Server error', error: error.message });
     }
+});
+
+// Global Error Handler
+app.use((err, req, res, next) => {
+    console.error('Unhandled Server Error:', err);
+    res.status(500).json({
+        message: 'Internal Server Error',
+        error: process.env.NODE_ENV === 'production' ? 'An unexpected error occurred' : err.message
+    });
 });
 
 // For Vercel, we need to export the app
