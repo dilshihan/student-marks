@@ -22,7 +22,9 @@ const User = () => {
     };
 
     const handleChange = (e) => {
-        setSearch({ ...search, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        const finalValue = name === 'registerNumber' ? value.toUpperCase() : value;
+        setSearch({ ...search, [name]: finalValue });
     };
 
     const handleCheck = async (e) => {

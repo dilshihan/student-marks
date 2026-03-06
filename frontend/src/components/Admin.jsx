@@ -97,7 +97,9 @@ const Admin = () => {
     };
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        const finalValue = name === 'registerNumber' ? value.toUpperCase() : value;
+        setFormData({ ...formData, [name]: finalValue });
     };
 
     const handleClassChange = (e) => {
@@ -268,7 +270,7 @@ const Admin = () => {
                             name="registerNumber"
                             placeholder="Register Number"
                             value={search.registerNumber}
-                            onChange={(e) => setSearch({ registerNumber: e.target.value })}
+                            onChange={(e) => setSearch({ registerNumber: e.target.value.toUpperCase() })}
                             style={{ marginBottom: 0, flex: 1 }}
                             required
                         />

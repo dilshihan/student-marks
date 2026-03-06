@@ -63,6 +63,9 @@ const StudentMarkSchema = new mongoose.Schema({
     }]
 }, { timestamps: true });
 
+// Compound unique index to prevent duplicate marks for same student and same exam
+StudentMarkSchema.index({ registerNumber: 1, examType: 1 }, { unique: true });
+
 // Prevent model re-definition error in HMR/Serverless
 const StudentMark = mongoose.models.StudentMark || mongoose.model('StudentMark', StudentMarkSchema);
 
@@ -77,10 +80,22 @@ app.post('/api/admin/add-mark', async (req, res) => {
             return res.status(400).json({ message: 'All required fields (Name, Register Number, Class, Exam Type) must be provided' });
         }
 
-        const regNo = registerNumber.trim();
+        const regNo = registerNumber.trim().toUpperCase();
         const exam = examType.trim();
 
-        // Check if marks for this specific exam already exist for this student
+        // 1. Check if this register number is associated with a DIFFERENT name already
+        // This prevents the same register number from being used by two different students
+        const otherStudent = await StudentMark.findOne({
+            registerNumber: regNo,
+            name: { $ne: name.trim() }
+        });
+        if (otherStudent) {
+            return res.status(400).json({
+                message: `Register number ${regNo} is already assigned to student "${otherStudent.name}".`
+            });
+        }
+
+        // 2. Check if marks for this specific exam already exist for this student
         const existingMark = await StudentMark.findOne({ registerNumber: regNo, examType: exam });
         if (existingMark) {
             return res.status(400).json({ message: `Student ${name} (${regNo}) already has marks for ${exam}.` });
@@ -114,19 +129,47 @@ app.put('/api/admin/update-mark/:id', async (req, res) => {
         const { id } = req.params;
         const { name, fatherName, registerNumber, className, examType, subjects, totalWorkingDays, totalWorkingDaysAttended } = req.body;
 
+        const regNo = registerNumber ? registerNumber.trim().toUpperCase() : '';
+        const exam = examType ? examType.trim() : '';
+
+        // Check for uniqueness during update
+        if (regNo && exam) {
+            // Check if another student has this reg number
+            const otherStudent = await StudentMark.findOne({
+                _id: { $ne: id },
+                registerNumber: regNo,
+                name: { $ne: name.trim() }
+            });
+            if (otherStudent) {
+                return res.status(400).json({
+                    message: `Register number ${regNo} is already assigned to student "${otherStudent.name}".`
+                });
+            }
+
+            // Check if this exam already exists for this reg number in ANOTHER record
+            const duplicatedExam = await StudentMark.findOne({
+                _id: { $ne: id },
+                registerNumber: regNo,
+                examType: exam
+            });
+            if (duplicatedExam) {
+                return res.status(400).json({ message: `Marks for ${regNo} and ${exam} already exist in another record.` });
+            }
+        }
+
         // Filter out empty subjects safely
         const validSubjects = subjects && Array.isArray(subjects)
             ? subjects.filter(sub => sub.subjectName && sub.mark !== '' && sub.mark !== null)
             : [];
 
         const updatedMark = await StudentMark.findByIdAndUpdate(id, {
-            name,
-            fatherName,
-            registerNumber,
-            className,
-            examType,
-            totalWorkingDays,
-            totalWorkingDaysAttended,
+            name: name ? name.trim() : '',
+            fatherName: fatherName ? fatherName.trim() : '',
+            registerNumber: regNo,
+            className: className ? className.trim() : '',
+            examType: exam,
+            totalWorkingDays: totalWorkingDays || 0,
+            totalWorkingDaysAttended: totalWorkingDaysAttended || 0,
             subjects: validSubjects
         }, { new: true });
 
@@ -197,7 +240,7 @@ app.post('/api/user/check-mark', async (req, res) => {
             return res.status(400).json({ message: 'Register number is required' });
         }
 
-        const regNo = String(registerNumber).trim();
+        const regNo = String(registerNumber).trim().toUpperCase();
 
         const students = await StudentMark.find({
             registerNumber: regNo
