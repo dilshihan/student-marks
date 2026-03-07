@@ -224,7 +224,7 @@ app.get('/api/health', (req, res) => {
 app.post('/api/admin/login', (req, res) => {
     const { password } = req.body;
     // Hardcoded password for simplicity as requested
-    if (password === '1156') {
+    if (password === 'ham1156kkd') {
         res.json({ success: true });
     } else {
         res.status(401).json({ success: false, message: 'Invalid password' });
